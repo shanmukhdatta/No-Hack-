@@ -61,7 +61,19 @@ These local results were supplied in chat by the Windows tester, not independent
   files. Wheel-build step is intentionally Linux-only.
 - Earlier initial-formatting CI failed and was repaired; pass evidence above
   is for the subsequent source commit, not the first code commit.
-- Local Windows Antigravity Phase 1 replay and smoke: **pending user check**.
-  PR #2 stays unmerged pending user acceptance.
+- Local Windows Antigravity Phase 1 replay and smoke: **PASS (user-reported 2026-10-13)**: 48 tests passed, 95.89% coverage; Ruff lint/format, mypy, build, CLI doctor and import checks passed.
+  These are user-supplied local results, not independently run on that device here.
+- Phase 1 PR #2 was subsequently **merged into main**, verified at commit
+  `dca8a05fbfcf8b7bff2d0f83bf162e3933788e5d`.
 - This suite proves schema/static-fixture streaming parity only. Real Windows
   capture behavior has not been tested and must not be claimed as passed.
+
+## Phase 2 — Windows metadata capture and flow lifecycle
+
+- Date: 2026-10-13.
+- Branch: `phase-02-windows-capture`; baseline verified `main` at `dca8a05fbfcf8b7bff2d0f83bf162e3933788e5d`.
+- Implemented on branch: Scapy normalization, Windows/Npcap readiness checks, explicit interface selection, opt-in finite capture, bounded canonical flow manager, FIN/RST/reuse logic, shutdown flush, conservative psutil enrichment, shared PCAP replay, CLI capture diagnostics, and synthetic tests.
+- Data boundary: Scapy packet contents are not stored in flow state; only metadata is retained. Explicit JSONL export contains IP/port/process context and must be protected. No ML verdicts, packet injection, or automatic blocking.
+- Normalization and lifecycle contract: documented in `docs/PHASE2_CAPTURE.md`; 33 NoHackFlow v1 model features unchanged.
+- **Acceptance: pending.** CI and actual Windows/Npcap interface verification must be recorded with commit-specific evidence. Initial CI attempts reported formatting/import issues and were corrected on the branch; do not mistake them for successful checks.
+- Phase 3 handoff: consume `FlowProcessor`, `FlowManager`, `CompletedFlow` and `CaptureSession` without introducing a second feature schema. Runtime service orchestration, persistence and inference are later phases.
