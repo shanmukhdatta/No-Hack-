@@ -267,7 +267,7 @@ def test_process_table_error_gracefully_degrades(monkeypatch: Any) -> None:
 def test_replay_invalid_data(tmp_path: Path) -> None:
     bad = tmp_path / "bad.pcap"
     bad.write_bytes(b"not a valid pcap file")
-    with pytest.raises((CaptureError, Exception)):
+    with pytest.raises(CaptureError):
         list(replay_pcap(bad))
 
 
@@ -290,3 +290,18 @@ def test_capabilities_with_simulated_windows(monkeypatch: Any) -> None:
             raising=False,
         )
         assert capture_capabilities()["npcap_dlls_found"] is False
+
+
+def test_cli_interruption_is_controlled(monkeypatch: Any, capsys: Any) -> None:
+    import nohack.capture.commands as commands
+    from nohack.cli import main
+
+    monkeypatch.setattr(
+        commands,
+        "capture_for_duration",
+        lambda *args: (_ for _ in ()).throw(KeyboardInterrupt()),
+    )
+    assert main([
+        "capture-demo", "--interface", "dummy", "--authorized"
+    ]) == 130
+    assert "interrupted" in capsys.readouterr().err
