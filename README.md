@@ -2499,3 +2499,19 @@ Use [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DEVELOPMENT.md](docs/DEV
 
 GitHub is the source of truth. Antigravity is used for Windows-native checks; Kaggle is for later expensive ML experiments.
 
+
+
+## Phase 2 — Windows capture implementation (working branch)
+
+An opt-in Windows Npcap/Scapy capture adapter and a shared PCAP replay adapter are
+implemented on `phase-02-windows-capture` for review. Install Python 3.11 with
+`pip install -e ".[dev,capture]"`; install Npcap separately and review its
+license. Try `nohack capture-check`, then `nohack capture-interfaces`.
+On an interface you are authorized to monitor, use
+`nohack capture-demo --interface "INTERFACE" --seconds 10 --authorized`.
+Or summarize a legally obtained local PCAP with `nohack replay-pcap --input FILE`.
+Records containing endpoint/process metadata are only persisted if `--output
+PATH.jsonl` is explicitly supplied. All records contain the existing 33
+NoHackFlow v1 feature inputs; **no ML model is loaded**. CI and real hardware
+acceptance must be checked in `docs/PHASE_LOG.md`. For semantics, privacy,
+installation and Phase 3 handoff, see [docs/PHASE2_CAPTURE.md](docs/PHASE2_CAPTURE.md).

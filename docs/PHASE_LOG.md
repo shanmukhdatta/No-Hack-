@@ -61,7 +61,117 @@ These local results were supplied in chat by the Windows tester, not independent
   files. Wheel-build step is intentionally Linux-only.
 - Earlier initial-formatting CI failed and was repaired; pass evidence above
   is for the subsequent source commit, not the first code commit.
-- Local Windows Antigravity Phase 1 replay and smoke: **pending user check**.
-  PR #2 stays unmerged pending user acceptance.
+- Local Windows Antigravity Phase 1 replay and smoke: **PASS (user-reported 2026-10-13)**: 48 tests passed, 95.89% coverage; Ruff lint/format, mypy, build, CLI doctor and import checks passed.
+  These are user-supplied local results, not independently run on that device here.
+- Phase 1 PR #2 was subsequently **merged into main**, verified at commit
+  `dca8a05fbfcf8b7bff2d0f83bf162e3933788e5d`.
 - This suite proves schema/static-fixture streaming parity only. Real Windows
   capture behavior has not been tested and must not be claimed as passed.
+
+## Phase 2 — Windows metadata capture and flow lifecycle
+
+- Date: 2026-10-13.
+- Branch: `phase-02-windows-capture`; baseline verified `main` at `dca8a05fbfcf8b7bff2d0f83bf162e3933788e5d`.
+- Implemented on branch: Scapy normalization, Windows/Npcap readiness checks, explicit interface selection, opt-in finite capture, bounded canonical flow manager, FIN/RST/reuse logic, shutdown flush, conservative psutil enrichment, shared PCAP replay, CLI capture diagnostics, and synthetic tests.
+- Data boundary: Scapy packet contents are not stored in flow state; only metadata is retained. Explicit JSONL export contains IP/port/process context and must be protected. No ML verdicts, packet injection, or automatic blocking.
+- Normalization and lifecycle contract: documented in `docs/PHASE2_CAPTURE.md`; 33 NoHackFlow v1 model features unchanged.
+- **Acceptance: pending.** CI and actual Windows/Npcap interface verification must be recorded with commit-specific evidence. Initial CI attempts reported formatting/import issues and were corrected on the branch; do not mistake them for successful checks.
+- Phase 3 handoff: consume `FlowProcessor`, `FlowManager`, `CompletedFlow` and `CaptureSession` without introducing a second feature schema. Runtime service orchestration, persistence and inference are later phases.
+
+### Phase 2 GitHub Actions evidence (2026-10-13)
+
+- Source commit: `ba5f139761ef3828f810c976f43285abcfc52420`.
+- GitHub Actions: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38446940900 — both Python 3.11 jobs **PASS**.
+- Linux: **75 passed**, branch-aware **89.02% coverage**, Ruff lint and format pass, strict mypy (33 files) pass, source and wheel build pass, wheel smoke pass.
+- GitHub-hosted Windows: **75 passed**, branch-aware **89.11% coverage**, Ruff lint/format pass and strict mypy (33 files) pass. This is an unprivileged Windows CI runner and **does not prove Npcap driver/interface operation**.
+- No actual Windows hardware Npcap test has been completed yet; Antigravity user-device installation, interface enumeration, authorized live traffic demo, JSONL inspection, Ctrl+C drain, CPU/memory and privacy checks remain **PENDING**.
+- A documentation-only commit following the source commit must be checked separately in CI. PR review remains **pending user approval**; main is not to be changed without approval.
+
+### Phase 2 local Windows Antigravity verification (user-provided, 2026-10-13)
+
+- Machine reported: Windows 11 x64; Python 3.11.9, Scapy 2.8.0,
+  psutil 7.2.2; validated branch at `5b89192bbc4c2ea1045a03c690a9dbef6a5f704f`.
+  These are **reported user-device results**, not independently executed
+  on that machine by the assistant or GitHub Actions.
+- `pip install -e ".[dev,capture]"` succeeded; `nohack doctor` remained
+  foundation-only (capture/model inactive).
+- Local pytest **75 passed**, **89.11%** branch-aware coverage;
+  Ruff lint/format, strict mypy and sdist/wheel build all passed.
+- Authorized synthetic seven-packet TCP PCAP replay **PASS**:
+  one completed flow with 33 feature fields, total packet count 7
+  (forward 4 / backward 3), 296 IP bytes, 300ms duration,
+  expected TCP flags, no payload fields, no ML inference and
+  a shutdown-completed record. The test checked feature name equality
+  but did not independently prove JSON key serialization order.
+- `nohack capture-check` reported `npcap_dlls_found: false` and
+  `live_capture_ready: false`. Interface listing and real capture
+  could not proceed: **Npcap driver missing on local machine**.
+  Native interface capture, live graceful Ctrl+C, and live CPU/memory
+  bounds remain **PENDING**, not PASS.
+- Subsequent review added an explicit regression test for serialized
+  feature ordering, fixed the JSONL writer to retain canonical order,
+  and made Npcap readiness probing support the standard
+  `System32/Npcap` installation (without WinPcap compatibility).
+  These changes postdate the local report and require their own CI
+  checks and subsequent Windows hardware smoke verification.
+- Phase 2 merge approval and start of Phase 3: **not granted**.
+
+### Phase 2 follow-up regression evidence (2026-10-13)
+
+- Code commit `ac9c612ff669a73e29da42e3144ec6f659a8d903`.
+- PR GitHub Actions run: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38449292386 — **PASS** on both Linux and Windows Python 3.11.
+- Linux: **76 passed**, branch-aware **88.81%** coverage, Ruff lint and format, strict mypy (33 files), package build and wheel smoke PASS.
+- Windows: **76 passed**, branch-aware **88.90%** coverage, Ruff lint/format and strict mypy (33 files) PASS.
+- The added test verifies canonical feature key order survives JSONL serialization
+  and checks Npcap standard DLL-directory detection with simulated DLLs.
+- **Hardware gate remains pending**: the earlier Windows local report does not
+  confirm actual Npcap capture or the follow-up code running on the physical
+  machine. No merge/Phase 3 acceptance is implied by hosted CI.
+
+### Phase 2 Windows Npcap hardware capture (user-reported, 2026-10-13)
+
+- Native Windows 11, Python 3.11.9, Npcap installed; tested repository SHA
+  `94a58347aa959e9c23c3d877076c45e8da7a8405`.
+- `capture-check` reported `live_capture_ready=true` and
+  `npcap_dlls_found=true`; interface enumeration returned 8 adapters.
+  The user consented to a 10-second capture on their selected Wi-Fi adapter.
+- **PASS on this hardware test:** authorized `capture-demo` exit 0, 15
+  completed flow records, zero active flows after duration timeout,
+  33 ordered NoHackFlow v1 feature keys per JSONL record, finite numbers,
+  matching packet/byte totals, metadata-only output, and no ML verdicts.
+  Local dependencies, Ruff, mypy and build passed. Unit suite passed
+  **76 tests** after correcting a local Windows-specific test assertion.
+- **Important measurement caveat:** recorded `packets_accepted=9321`,
+  `packets_out_of_order=14854`. A large fraction was rejected on the
+  strict global timestamp watermark. This does **not** prove accurate
+  capture completeness despite the 15 valid emitted flow records.
+- Correction on the Phase 2 PR branch: tolerate up to 2 seconds of
+  bounded cross-flow capture timestamp skew after wall-clock expiry ticks,
+  while retaining strict per-flow ordering and dropping genuinely stale
+  events. Add a deterministic regression test.
+- Local test correction: compare `Path(item).name` when simulating
+  Npcap DLL loads; actual Windows installs may load fully qualified paths.
+  Correction committed to PR branch (local Antigravity edit was not pushed).
+- The report called Ctrl+C PASS using a simulated unit test; it did
+  **not** document a physical Ctrl+C interruption. Timeout cleanup was
+  tested on the native device. CPU/RAM observations were qualitative.
+- **Follow-up:** revised lateness semantics and regression need CI, and
+  the actual live `packets_out_of_order` proportion must be retested on
+  a future authorized Windows run (as part of Phase 3 acceptance at
+  latest). Distinguish hardware verification of initial capture from
+  unverified post-review adjustments. No endpoint metadata was uploaded.
+
+### Phase 2 Windows fix and final source CI (2026-10-13)
+
+- Source commit: `92b7c2d9c6f9dea2f6cb4c3cedf1684cf48d7574`.
+- PR CI run: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38451915896
+  — Linux **PASS** (77 tests, **89.13%** coverage, Ruff lint/format,
+  mypy, wheel/sdist smoke) and Windows **PASS** (77 tests, **89.23%**
+  coverage, Ruff lint/format, mypy).
+- Includes Windows-specific DLL test portability fix, bounded 2s
+  cross-flow timestamp tolerance and explicit regression tests.
+- Physical Wi-Fi/Npcap capture was user-reported at earlier
+  `94a58347aa959e9c23c3d877076c45e8da7a8405` before this fix;
+  post-fix live packet-rejection rate is **not yet measured**.
+  Carry that measurement into Phase 3 as an explicit follow-up gate;
+  do not claim zero packet loss or hardware re-verification of new code.

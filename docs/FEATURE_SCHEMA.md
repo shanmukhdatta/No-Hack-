@@ -1,6 +1,6 @@
 # NoHackFlow v1 — canonical feature contract
 
-**Phase 1, no ML inference or Windows capture yet.** The source of truth
+**Phase 1 contract, used by the Phase 2 Windows capture implementation.** The source of truth
 is src/nohack/features/ and configs/nohackflow-v1.json. There are **33 model
 inputs**: 32 numerical statistics/ports and one categorical protocol value.
 
@@ -15,8 +15,8 @@ this interface. Synthetic fixtures use reserved documentation addresses.
 A first-observed 5-tuple defines *forward* direction and reversed endpoints
 define *backward*. This is not proof of which endpoint initiated a connection.
 Packet times within each flow must be nondecreasing. Invalid/out-of-order
-events are rejected, not quietly repaired. Packet capture, flow-table
-expiry, bounded queues and device-side processes are Phase 2+ work.
+events are rejected, not quietly repaired. The Phase 2 adapter now handles capture, flow-table expiry and best-effort
+process context. Phase 3 owns broader queue/orchestration concerns.
 
 ## Feature conventions
 
@@ -76,3 +76,7 @@ Run from a clean clone with Python 3.11 and no administrator privileges:
 
 GitHub CI and these Windows checks must pass before merging. Npcap, Kaggle
 and model downloads are not needed for Phase 1.
+
+## Phase 2 integration note
+
+The Phase 2 Scapy packet normalizer is now the only packet-header-to-PacketMeta adapter used by both local PCAP replay and live Npcap ingestion. It uses integer-ns capture timestamps rounded with decimal ties-to-even arithmetic, IPv4 total lengths and IPv6 40+payload lengths. Unsupported fragments and protocols are skipped. The 33-column NoHackFlow v1 schema is unchanged. The flow manager enforces ordering and bounded TCP/UDP lifecycles before calling the existing Phase 1 `FlowAccumulator`. Process metadata and interface identifiers are non-model context. See [PHASE2_CAPTURE.md](PHASE2_CAPTURE.md) for implementation and device-verification limits.
