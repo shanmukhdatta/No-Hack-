@@ -41,8 +41,6 @@ def configure_logging(settings: Settings | None = None) -> logging.Logger:
     if current.log_format == "json":
         handler.setFormatter(JsonFormatter())
     else:
-        handler.setFormatter(
-            logging.Formatter("%(levelname)s %(name)s: %(message)s")
-        )
+        handler.setFormatter(logging.Formatter("%(levelname)s %(name)s: %(message)s"))
     logger.addHandler(handler)
     return logger
