@@ -2489,3 +2489,13 @@ Choose a license before the public release. Do not copy dataset licenses into th
 ## Responsible Use
 
 No Hack is intended for defensive monitoring, education, and research on systems and network traffic the user owns or is authorized to analyze.
+---
+
+## Implementation status and canonical phase plan (October 2026)
+
+**Phase 0 (foundation) is under implementation/review.** This README remains the complete technical scope specification. The historical 13-phase sequence in section 42 is preserved, but the project's newer, authoritative execution plan is the **15-phase (0–14) [docs/ROADMAP.md](docs/ROADMAP.md)**. That roadmap rearranges work to establish the feature contract and Windows capture before training deployable models; it does **not** cancel any ML algorithm or planned Windows capability.
+
+Use [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md), [docs/DECISIONS.md](docs/DECISIONS.md), and [docs/PHASE_LOG.md](docs/PHASE_LOG.md) for working engineering contracts, local setup, decisions and *verified* completion status. Foundation-only diagnostics are available through the nohack CLI; live capture, ML predictions, API and UI are **not** implemented in Phase 0.
+
+GitHub is the source of truth. Antigravity is used for Windows-native checks; Kaggle is for later expensive ML experiments.
+

@@ -1,0 +1,70 @@
+# Python / tooling
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+dist/
+build/
+.tox/
+*.log
+
+# Secrets and local overrides
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Downloaded and processed datasets
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/samples/*
+!data/samples/.gitkeep
+
+# Generated artifacts, runtime state and experiments
+artifacts/models/*
+!artifacts/models/.gitkeep
+artifacts/reports/*
+!artifacts/reports/.gitkeep
+artifacts/figures/*
+!artifacts/figures/.gitkeep
+mlruns/
+mlartifacts/
+runtime/*
+!runtime/.gitkeep
+
+# Captures, model blobs and databases
+*.pcap
+*.pcapng
+*.parquet
+*.joblib
+*.pkl
+*.pickle
+*.onnx
+*.pt
+*.pth
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
