@@ -17,6 +17,6 @@
 | D-013 | Keep original README section 42 intact, add canonical 15-phase ROADMAP | Historical README describes a 13-phase research-first ordering; finalized Phases 0–14 reorganize, not remove, that work |
 | D-014 | Ignore datasets, model artifacts, captures, SQLite and secrets | Avoid repository leaks and large binary history |
 | D-015 | CI only tests unprivileged foundation code in Phase 0 | Real Windows capture and desktop packaging tests belong to dedicated later phases |
-| D-016 | Dev dependencies bounded in pyproject; future fully resolved lock needed | Avoid pretending top-level ranges are a transitive dependency lock; record installed versions with pip freeze on each reviewed test run |
+| D-016 | Dev tools have a verified Python 3.11 constraints file; future hash-locked platform training environments still needed | Keep the Phase 0 test toolchain stable on Linux/Windows without pulling ML dependencies; record installed versions with pip freeze for each reviewed run |
 
 These decisions may be superseded only by a documented ADR with a reason and migration impact.

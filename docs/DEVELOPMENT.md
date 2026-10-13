@@ -16,7 +16,7 @@ git switch --track origin/phase-00-foundation
 git status --short
 py -3.11 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install --upgrade pip
-.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]" -c requirements/dev-py311-constraints.txt
 ~~~
 
 The expected git status is empty and current branch is phase-00-foundation. If you already cloned, run git fetch origin and git switch phase-00-foundation (or git switch --track origin/phase-00-foundation the first time).
@@ -54,7 +54,7 @@ Do not develop on main. Commit to a reviewed phase branch and open a PR; use Git
 
 ## Dependency reproducibility boundary
 
-The package pins its minimum Python version and bounds optional dependency *families*. This is not yet a hash-locked, transitive requirements lock. The version of each tool used in CI is observable in its job log; capture the installed versions with:
+The package pins its minimum Python version and bounds optional dependency families. The verified Phase 0 Python 3.11 CI development environment is additionally version-constrained in requirements/dev-py311-constraints.txt for both Linux and Windows. This file pins tested tooling/transitive versions but does not lock wheels by hash or guarantee platform-identical system dependencies. The version of each tool used in CI is observable in its job log; capture the installed versions with:
 
 ~~~powershell
 .\.venv\Scripts\python.exe -m pip freeze
