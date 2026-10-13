@@ -28,9 +28,7 @@ def tcp(
     flags: str = "A",
     sport: int = 50000,
 ) -> Any:
-    src, dst = ("192.0.2.2", "192.0.2.1") if reverse else (
-        "192.0.2.1", "192.0.2.2"
-    )
+    src, dst = ("192.0.2.2", "192.0.2.1") if reverse else ("192.0.2.1", "192.0.2.2")
     packet = scapy.IP(src=src, dst=dst) / scapy.TCP(
         sport=443 if reverse else sport,
         dport=sport if reverse else 443,
@@ -73,9 +71,9 @@ def test_ipv6_udp_and_ipv4_icmp_and_fragments() -> None:
     assert im.protocol == "ICMP"
     assert (im.src_port, im.dst_port) == (0, 0)
 
-    fragment = scapy.IP(
-        src="192.0.2.1", dst="192.0.2.2", flags="MF"
-    ) / scapy.UDP(sport=1, dport=2)
+    fragment = scapy.IP(src="192.0.2.1", dst="192.0.2.2", flags="MF") / scapy.UDP(
+        sport=1, dport=2
+    )
     fragment.time = 2
     assert normalize_scapy(fragment) is None
     assert normalize_scapy(scapy.ARP()) is None
@@ -188,12 +186,14 @@ def test_conservative_process_attribution(monkeypatch: pytest.MonkeyPatch) -> No
 
         def net_connections(self, kind: str) -> list[Any]:
             assert kind == "inet"
-            return [SimpleNamespace(
-                pid=12,
-                type=1,
-                laddr=SimpleNamespace(ip="192.0.2.1", port=50000),
-                raddr=SimpleNamespace(ip="192.0.2.2", port=443),
-            )]
+            return [
+                SimpleNamespace(
+                    pid=12,
+                    type=1,
+                    laddr=SimpleNamespace(ip="192.0.2.1", port=50000),
+                    raddr=SimpleNamespace(ip="192.0.2.2", port=443),
+                )
+            ]
 
         def Process(self, pid: int) -> Any:
             return SimpleNamespace(name=lambda: "synthetic-process", pid=pid)
