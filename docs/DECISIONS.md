@@ -20,3 +20,7 @@
 | D-016 | Dev tools have a verified Python 3.11 constraints file; future hash-locked platform training environments still needed | Keep the Phase 0 test toolchain stable on Linux/Windows without pulling ML dependencies; record installed versions with pip freeze for each reviewed run |
 
 These decisions may be superseded only by a documented ADR with a reason and migration impact.
+
+| D-017 | Live and PCAP packets use the same Scapy-to-PacketMeta normalization and existing FlowAccumulator | Eliminates duplicated length/timestamp/feature definitions; synthetic replay parity is testable, but device parity needs native Windows verification |
+| D-018 | Bound one flow table by idle/max-lifetime timers, max active count, TCP RST/FIN grace, and explicit shutdown drain | Prevents unbounded metadata state and preserves partial records; repeated 5-tuples without observable SYN cannot be perfectly separated |
+| D-019 | No passive capture without explicit CLI consent and interface; do not distribute Npcap | Avoid unexpected observation of private traffic; Npcap redistribution and usage restrictions require separate review |
