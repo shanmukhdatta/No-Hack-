@@ -14,8 +14,9 @@ def capture_capabilities() -> dict[str, object]:
     npcap = False
     if sys.platform == "win32":
         try:
-            ctypes.WinDLL("wpcap.dll")  # type: ignore[attr-defined]
-            ctypes.WinDLL("Packet.dll")  # type: ignore[attr-defined]
+            loader = getattr(ctypes, "WinDLL")
+            loader("wpcap.dll")
+            loader("Packet.dll")
             npcap = True
         except (OSError, AttributeError):
             pass
