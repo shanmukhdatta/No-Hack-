@@ -189,9 +189,7 @@ def test_packet_adapters_fail_on_invalid_unknown_or_mixed_data() -> None:
     with pytest.raises(ValueError, match="TCP flags"):
         PacketMeta.from_mapping({**rows[0], "protocol": "UDP"})
     with pytest.raises(ValueError, match="zero-valued"):
-        PacketMeta.from_mapping(
-            {**rows[0], "protocol": "ICMP", "tcp_flags": []}
-        )
+        PacketMeta.from_mapping({**rows[0], "protocol": "ICMP", "tcp_flags": []})
     with pytest.raises(ValueError, match="Out-of-order"):
         replay_packets([rows[2], rows[0]])
     other = dict(rows[1])
