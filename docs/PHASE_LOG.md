@@ -115,3 +115,15 @@ These local results were supplied in chat by the Windows tester, not independent
   These changes postdate the local report and require their own CI
   checks and subsequent Windows hardware smoke verification.
 - Phase 2 merge approval and start of Phase 3: **not granted**.
+
+### Phase 2 follow-up regression evidence (2026-10-13)
+
+- Code commit `ac9c612ff669a73e29da42e3144ec6f659a8d903`.
+- PR GitHub Actions run: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38449292386 — **PASS** on both Linux and Windows Python 3.11.
+- Linux: **76 passed**, branch-aware **88.81%** coverage, Ruff lint and format, strict mypy (33 files), package build and wheel smoke PASS.
+- Windows: **76 passed**, branch-aware **88.90%** coverage, Ruff lint/format and strict mypy (33 files) PASS.
+- The added test verifies canonical feature key order survives JSONL serialization
+  and checks Npcap standard DLL-directory detection with simulated DLLs.
+- **Hardware gate remains pending**: the earlier Windows local report does not
+  confirm actual Npcap capture or the follow-up code running on the physical
+  machine. No merge/Phase 3 acceptance is implied by hosted CI.
