@@ -38,9 +38,9 @@ def register_capture_commands(subparsers: Any) -> None:
     demo.add_argument("--output", type=Path)
 
 
-def _processor() -> FlowProcessor:
+def _processor(*, enrich_processes: bool = False) -> FlowProcessor:
     resolver: Callable[..., Any] | None = None
-    if sys.platform == "win32":
+    if enrich_processes and sys.platform == "win32":
         resolver = ProcessAttributor().lookup
     return FlowProcessor(FlowManager(process_resolver=resolver))
 
@@ -51,7 +51,7 @@ def _summary(processor: FlowProcessor, delivered: int) -> dict[str, object]:
         "schema": "nohackflow-v1",
         "classification_active": False,
         "capture_payloads_saved": False,
-        "packets_accepted": counters.ingested,
+        "packets_accepted": counters.ingested - counters.out_of_order,
         "packets_skipped": processor.skipped,
         "packets_malformed": processor.malformed,
         "packets_out_of_order": counters.out_of_order,
@@ -81,7 +81,7 @@ def run_capture_command(args: argparse.Namespace) -> int:
             raise CaptureError(
                 "Explicit --authorized consent is required for monitored traffic"
             )
-        processor = _processor()
+        processor = _processor(enrich_processes=args.command == "capture-demo")
         delivered = 0
         with ExitStack() as stack:
             output = getattr(args, "output", None)
@@ -101,6 +101,9 @@ def run_capture_command(args: argparse.Namespace) -> int:
                 delivered = session.delivered
             print(json.dumps(_summary(processor, delivered), sort_keys=True))
         return 0
+    except KeyboardInterrupt:
+        print("Capture interrupted; active flows flushed", file=sys.stderr)
+        return 130
     except (CaptureError, OSError, ValueError) as exc:
         print(f"Capture error: {exc}", file=sys.stderr)
         return 3
