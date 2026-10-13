@@ -80,7 +80,9 @@ class CaptureSession:
             )
             self._sniffer.start()
             if not ready.wait(timeout=3.0) or not self._sniffer.running:
-                raise CaptureError("Npcap could not start; check driver and permissions")
+                raise CaptureError(
+                    "Npcap could not start; check driver and permissions"
+                )
         except (OSError, RuntimeError, PermissionError, ValueError) as exc:
             self._sniffer = None
             raise CaptureError("Failed to start authorized capture") from exc
