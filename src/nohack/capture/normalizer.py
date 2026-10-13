@@ -34,8 +34,17 @@ def normalize_scapy(packet: Any) -> PacketMeta | None:
             "Install the optional capture extra: nohack[capture]"
         ) from exc
 
-    ip4 = packet.getlayer(scapy.IP)
-    ip6 = packet.getlayer(scapy.IPv6)
+    network = packet
+    for _ in range(16):
+        if isinstance(network, (scapy.IP, scapy.IPv6)):
+            break
+        network = getattr(network, "payload", None)
+        if network is None:
+            return None
+    else:
+        return None
+    ip4 = network if isinstance(network, scapy.IP) else None
+    ip6 = network if isinstance(network, scapy.IPv6) else None
     if ip4 is not None:
         if int(ip4.frag) != 0 or int(ip4.flags) & 1:
             return None
