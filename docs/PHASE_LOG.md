@@ -33,3 +33,18 @@ Linux run: 18 passed in 0.13s; Windows run: 18 passed in 0.27s. Coverage output 
 - `git status --short` → clean working tree.
 
 These local results were supplied in chat by the Windows tester, not independently run on that personal computer by GitHub Actions. The latest pre-documentation HEAD `967d7bb7e55d5ed3788a745f9a49c61a8cebba68` passed Linux/Windows GitHub CI in [push run #38430289641](https://github.com/shanmukhdatta/No-Hack-/actions/runs/38430289641) and [PR run #38430296936](https://github.com/shanmukhdatta/No-Hack-/actions/runs/38430296936). Documentation-only commit adding this record requires its own CI status check.
+
+## Phase 1 — canonical NoHackFlow features
+
+- Date: 2026-10-13
+- Branch: phase-01-nohackflow-features; base: main merge of Phase 0 PR #1.
+- Implemented: 33 ordered features, versioned JSON manifest, strict packet
+  metadata normalization, bidirectional first-seen flow orientation, online
+  duration/rate/length/IAT/TCP flag statistics, deterministic synthetic replay.
+- Safety: payload data prohibited, no network capture, no ML predictions,
+  endpoint identity excluded from predictive columns, unknown research-only
+  columns rejected.
+- Test fixtures: synthetic TCP reverse-direction replay and IPv6/UDP edge
+  cases, feature-invalidity tests, streaming vs offline intermediate parity.
+- **Acceptance not complete until GitHub CI and Windows Antigravity tests pass.**
+  This phase does not prove real PCAP/live parity; that belongs to Phase 2.
