@@ -198,13 +198,15 @@ def test_conservative_process_attribution(monkeypatch: pytest.MonkeyPatch) -> No
         def Process(self, pid: int) -> Any:
             return SimpleNamespace(name=lambda: "synthetic-process", pid=pid)
 
+    forward = metadata(1)
+    backward = metadata(1, reverse=True)
     fake = FakePsutil()
     monkeypatch.setattr(process_module.importlib, "import_module", lambda _: fake)
-    attribution = ProcessAttributor().lookup(metadata(1))
+    attribution = ProcessAttributor().lookup(forward)
     assert attribution is not None
     assert attribution.pid == 12
     assert attribution.name == "synthetic-process"
-    assert ProcessAttributor().lookup(metadata(1, reverse=True)) is not None
+    assert ProcessAttributor().lookup(backward) is not None
 
 
 def test_flow_config_rejects_invalid_settings() -> None:
