@@ -8,6 +8,7 @@ import sys
 from collections.abc import Sequence
 
 from nohack import __version__
+from nohack.capture.commands import register_capture_commands, run_capture_command
 from nohack.config.logging import configure_logging
 from nohack.config.settings import load_settings
 from nohack.exceptions import ConfigurationError
@@ -24,6 +25,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     commands = parser.add_subparsers(dest="command")
     commands.add_parser("doctor", help="Validate configuration and show build status")
+    register_capture_commands(commands)
     args = parser.parse_args(argv)
     if args.command is None:
         parser.print_help()
@@ -33,6 +35,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ConfigurationError as exc:
         print(f"Configuration error: {exc}", file=sys.stderr)
         return 2
+    if args.command != "doctor":
+        return run_capture_command(args)
     logger = configure_logging(settings)
     logger.info("Foundation diagnostics completed", extra={"event": "doctor"})
     report = {
