@@ -92,7 +92,9 @@ local address/port, transport and optional remote peer. Ambiguous socket
 matches, inaccessible processes, unsupported protocols and race conditions
 return `None`; a process can exit/reuse a PID between capture and lookup.
 Process names and PIDs are **best-effort auxiliary context**, never model
-columns or attribution proof.
+columns or attribution proof. Attribution is only attempted during **live**
+Windows collection; historical PCAP replay never matches against today's OS
+socket table.
 
 ## Privacy, operation and Npcap license
 
