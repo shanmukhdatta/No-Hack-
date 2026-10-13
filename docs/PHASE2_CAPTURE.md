@@ -13,7 +13,10 @@ package installation, `nohack doctor`, or `nohack capture-check`.
 
 1. Use Python 3.11 on Windows and install `python -m pip install -e ".[dev,capture]" -c requirements/dev-py311-constraints.txt`.
 2. Install Npcap separately from its official distribution, subject to its
-   current EULA. No Hack does not redistribute Npcap.
+   current EULA. No Hack does not redistribute Npcap. The supported Scapy
+   installation recommends **disabling WinPcap compatibility mode**;
+   No Hack probes both the standard `System32/Npcap` DLL directory and the
+   legacy compatibility layout. See https://scapy.readthedocs.io/en/latest/installation.html
 3. Run `nohack capture-check` and `nohack capture-interfaces` to identify an
    available, authorized network interface. Presence of DLLs cannot verify
    access rights, working drivers or capture performance.
@@ -123,3 +126,7 @@ The Phase 3 runtime orchestrator may own a `FlowProcessor`, configure
 ticks. It must manage storage/retention, health, and stable delivery separately.
 Do not mark absent ML inference as successful threat classification. Integrate
 the same `NoHackFlow` schema and preserve metadata-only boundaries.
+
+The optional JSONL writer preserves the 33 ordered model feature keys;
+consumers must not depend on JSON object ordering for model inputs and should
+use `ordered_feature_values()` to establish the canonical column order.
