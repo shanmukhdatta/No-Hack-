@@ -228,3 +228,17 @@ def test_cli_requires_opt_in(capsys: pytest.CaptureFixture[str]) -> None:
     assert report["live_capture_ready"] in {True, False}
     assert main(["doctor"]) == 0
     assert json.loads(capsys.readouterr().out)["model_loaded"] is False
+
+
+def test_first_network_layer_wins_and_tunnels_are_skipped() -> None:
+    tunneled = (
+        scapy.IPv6(src="2001:db8::10", dst="2001:db8::20")
+        / scapy.IP(src="192.0.2.10", dst="192.0.2.20")
+        / scapy.TCP(sport=12, dport=443)
+    )
+    tunneled.time = 3
+    assert normalize_scapy(tunneled) is None
+    wrapped = scapy.Ether() / tcp(3_000_000_000)
+    normalized = normalize_scapy(wrapped)
+    assert normalized is not None
+    assert normalized.src_ip == "192.0.2.1"
