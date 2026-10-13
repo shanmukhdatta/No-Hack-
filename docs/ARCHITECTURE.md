@@ -56,3 +56,7 @@ Default API host is 127.0.0.1. The collector requires explicit permission and au
 - GitHub: permanent versioned source of truth and PR/CI review.
 - Antigravity IDE on Windows: native packet capture/UI tests and final installation verification.
 - Kaggle: high-compute future training on legally usable datasets; exported artifacts checked against manifest and schema locally.
+
+## Phase 2 implementation boundary
+
+The Phase 2 `capture.normalizer` accepts Scapy packets and returns only validated `PacketMeta` values. `collector.flows.FlowManager` owns bounded canonical bidirectional flow state and emits immutable NoHackFlow snapshots. The same `capture.replay.FlowProcessor` handles PCAP and live callback traffic. `capture.session.CaptureSession` isolates Npcap/AsyncSniffer from the rest of the application and never starts without explicit user action. `collector.process.ProcessAttributor` supplies optional process metadata, outside the 33 model features. Timeouts, resource limits, and the Phase 3 callback contract are defined in [PHASE2_CAPTURE.md](PHASE2_CAPTURE.md). No ML inference is introduced.
