@@ -148,6 +148,32 @@ def test_idle_max_duration_capacity_and_ordering() -> None:
     assert not manager.active
 
 
+def test_wall_clock_tick_tolerates_bounded_packet_lateness() -> None:
+    limits = FlowLimits(max_packet_lateness_ns=100)
+    manager = FlowManager(limits)
+    first = metadata(1_000)
+    assert manager.ingest(first) == []
+
+    # A live session's periodic tick runs at wall time. Packets already
+    # captured may arrive a few nanoseconds earlier than that tick.
+    assert manager.expire(1_100) == []
+    different_flow = normalize_scapy(tcp(1_050, sport=50001))
+    assert different_flow is not None
+    assert manager.ingest(different_flow) == []
+    assert manager.ingest(metadata(1_080)) == []
+
+    # Per-flow ordering remains strict.
+    assert manager.ingest(metadata(1_070)) == []
+    # Truly stale packets beyond the bounded lateness are still rejected.
+    stale_new = normalize_scapy(tcp(990, sport=50002))
+    assert stale_new is not None
+    assert manager.ingest(stale_new) == []
+    assert manager.counters.out_of_order == 2
+    completed = manager.flush()
+    assert len(completed) == 2
+    assert sum(r.flow.features["total_packet_count"] for r in completed) == 3
+
+
 def test_offline_live_pipeline_parity(tmp_path: Path) -> None:
     packets = [
         tcp(1_000_000_000, flags="S"),
