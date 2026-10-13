@@ -41,8 +41,11 @@ or an ML predictor.
    are not discarded.
 5. Do not infer a historical PCAP process from current Windows socket tables.
    Best-effort OS context is for authorized live capture only.
-6. Expiration ticks use epoch nanoseconds; out-of-order events are rejected
-   rather than reordered. Rates/durations remain Phase 1 definitions.
+6. Expiration ticks use epoch nanoseconds; per-flow out-of-order events
+   are rejected, while cross-flow timestamp skew is tolerated within
+   `FlowLimits.max_packet_lateness_ns` (default 2 seconds). Packet arrivals
+   beyond the global lateness threshold are counted as rejected, not
+   reordered. Rates/durations remain Phase 1 definitions.
 7. Preserve explicit consent, local-only scope, and no payload/packet
    persistence. No network injection or blocking feature is authorized.
 
@@ -50,10 +53,17 @@ or an ML predictor.
 
 - Phase 2 synthetic tests, Ruff, mypy, build and Linux/Windows CI must pass
   at a specific PR commit; update `docs/PHASE_LOG.md` with actual evidence.
-- The user's Windows Antigravity run still must verify Npcap installation,
-  enumeration, an authorized 10-second capture, JSONL feature validation,
-  resource stability and graceful Ctrl+C.
-- If that real-device verification fails, fix Phase 2 on the **same PR branch**
-  and repeat the checks before merging; do not silently start Phase 3.
+- The user has reported Npcap installation, interface enumeration and an
+  authorized 10-second capture on Windows (15 validated records, exit 0).
+  Their original output included 14,854 globally out-of-order packet
+  rejections versus 9,321 accepted; a subsequent Phase 2 fix introduces
+  bounded lateness. Recheck real-device rejection counts on the revised
+  commit before treating capture statistics as representative. Timeout-based
+  cleanup was observed; actual keyboard Ctrl+C was unit-tested via a
+  simulated interruption, not independently hardware-verified.
+- If real-device verification fails, fix regressions on the relevant review
+  branch and repeat all checks. Phase 3 must include diagnostics for input
+  counts and out-of-order drops, with explicit live re-verification of
+  timestamp lateness following the Phase 2 correction.
 - In Phase 3, introduce a bounded service/event-delivery lifecycle and health
   reporting as defined by `docs/ROADMAP.md`, without new ML claims.
