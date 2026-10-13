@@ -82,9 +82,7 @@ def _key(packet: PacketMeta) -> FlowKey:
 
 def _side(packet: PacketMeta, state: _Active) -> int:
     first = state.accumulator.first
-    return int(
-        (packet.src_ip, packet.src_port) != (first.src_ip, first.src_port)
-    )
+    return int((packet.src_ip, packet.src_port) != (first.src_ip, first.src_port))
 
 
 class FlowManager:
