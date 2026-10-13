@@ -48,3 +48,20 @@ These local results were supplied in chat by the Windows tester, not independent
   cases, feature-invalidity tests, streaming vs offline intermediate parity.
 - **Acceptance not complete until GitHub CI and Windows Antigravity tests pass.**
   This phase does not prove real PCAP/live parity; that belongs to Phase 2.
+
+### Phase 1 GitHub CI evidence (source commit 4218aad46dabddcb91e31ec9ae3fb5b7cbb20ecc)
+
+- CI run: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38440746097
+- GitHub-hosted Linux Python 3.11: PASS. 48 tests passed, 96% branch-aware
+  coverage (338 statements, 10 missed; 100 branches, 8 partial), Ruff lint
+  and format clean, mypy clean across 26 source files, sdist/wheel build and
+  wheel smoke passed.
+- GitHub-hosted Windows Python 3.11: PASS. 48 tests passed, 96% coverage,
+  Ruff lint/format clean (38 files formatted), mypy clean across 26 source
+  files. Wheel-build step is intentionally Linux-only.
+- Earlier initial-formatting CI failed and was repaired; pass evidence above
+  is for the subsequent source commit, not the first code commit.
+- Local Windows Antigravity Phase 1 replay and smoke: **pending user check**.
+  PR #2 stays unmerged pending user acceptance.
+- This suite proves schema/static-fixture streaming parity only. Real Windows
+  capture behavior has not been tested and must not be claimed as passed.
