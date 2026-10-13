@@ -17,6 +17,8 @@ class FlowLimits:
     idle_timeout_ns: int = 30_000_000_000
     max_lifetime_ns: int = 120_000_000_000
     close_grace_ns: int = 1_000_000_000
+    # Permit small cross-flow timestamp skew and capture-to-callback delay.
+    max_packet_lateness_ns: int = 2_000_000_000
     max_active: int = 4096
 
     def __post_init__(self) -> None:
@@ -24,8 +26,10 @@ class FlowLimits:
             value = getattr(self, name)
             if type(value) is not int or value <= 0:
                 raise ValueError(f"{name} must be a positive integer")
-        if type(self.close_grace_ns) is not int or self.close_grace_ns < 0:
-            raise ValueError("close_grace_ns must be a nonnegative integer")
+        for name in ("close_grace_ns", "max_packet_lateness_ns"):
+            value = getattr(self, name)
+            if type(value) is not int or value < 0:
+                raise ValueError(f"{name} must be a nonnegative integer")
 
 
 @dataclass(frozen=True, slots=True)
@@ -149,8 +153,13 @@ class FlowManager:
         if state is not None and packet.timestamp_ns < state.last_ns:
             self.counters.out_of_order += 1
             return []
-        if packet.timestamp_ns < self.watermark_ns:
-            # Prevent already-expired tuples from reopening as stale sessions.
+        if (
+            packet.timestamp_ns + self.limits.max_packet_lateness_ns
+            < self.watermark_ns
+        ):
+            # Ignore genuinely stale arrivals, not normal cross-flow jitter.
+            # Expiration ticks use wall time and can exceed packet timestamps
+            # by milliseconds even on healthy Windows/Npcap hosts.
             self.counters.out_of_order += 1
             return []
         completed = self.expire(packet.timestamp_ns)
