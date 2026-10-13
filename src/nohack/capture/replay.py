@@ -55,6 +55,7 @@ def replay_pcap(
         with scapy.PcapReader(str(path)) as reader:
             for packet in reader:
                 yield from engine.accept(packet)
-    except (OSError, ValueError, EOFError) as exc:
+    except Exception as exc:
+        # Scapy raises its own parser errors for invalid/truncated PCAP files.
         raise CaptureError("Unable to parse local PCAP") from exc
     yield from engine.finish()
