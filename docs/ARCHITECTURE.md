@@ -6,7 +6,7 @@ No Hack targets one Windows machine as a local-first defensive flow monitor. It 
 
 ~~~text
 Authorized Windows network interface
-  -> Npcap / Scapy collector (future phase 2)
+  -> Npcap / Scapy collector (Phase 2 opt-in implementation)
   -> packet metadata normalization + bidirectional flow table
   -> NoHackFlow versioned feature contract (phase 1)
   -> schema/type validation
