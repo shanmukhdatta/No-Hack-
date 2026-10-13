@@ -63,11 +63,18 @@ def test_cli_replay_explicit_metadata_export(tmp_path: Path, capsys: Any) -> Non
     capture = tmp_path / "controlled.pcap"
     scapy.wrpcap(str(capture), [sample_ip()])
     output = tmp_path / "flows.jsonl"
-    assert main([
-        "replay-pcap",
-        "--input", str(capture),
-        "--output", str(output),
-    ]) == 0
+    assert (
+        main(
+            [
+                "replay-pcap",
+                "--input",
+                str(capture),
+                "--output",
+                str(output),
+            ]
+        )
+        == 0
+    )
     summary = json.loads(capsys.readouterr().out)
     assert summary["flows_completed"] == 1
     assert summary["classification_active"] is False
@@ -144,7 +151,9 @@ def test_session_start_rejected_without_npcap(monkeypatch: Any) -> None:
     import nohack.capture.session as mod
 
     session = CaptureSession("interface", FlowProcessor(), lambda _: None)
-    monkeypatch.setattr(mod, "capture_capabilities", lambda: {"live_capture_ready": False})
+    monkeypatch.setattr(
+        mod, "capture_capabilities", lambda: {"live_capture_ready": False}
+    )
     with pytest.raises(CaptureError, match="Npcap"):
         session.start()
     with pytest.raises(ValueError, match="interface"):
@@ -154,7 +163,9 @@ def test_session_start_rejected_without_npcap(monkeypatch: Any) -> None:
 def test_session_rejects_unknown_interface(monkeypatch: Any) -> None:
     import nohack.capture.session as mod
 
-    monkeypatch.setattr(mod, "capture_capabilities", lambda: {"live_capture_ready": True})
+    monkeypatch.setattr(
+        mod, "capture_capabilities", lambda: {"live_capture_ready": True}
+    )
     monkeypatch.setattr(mod, "list_interfaces", lambda: ["different"])
     with pytest.raises(CaptureError, match="unavailable"):
         CaptureSession("expected", FlowProcessor(), lambda _: None).start()
@@ -225,9 +236,12 @@ def test_process_matching_missing_ambiguous_and_denied(monkeypatch: Any) -> None
         fake.sockets = [
             SimpleNamespace(pid=12, type=2, laddr=access, raddr=remote),
             SimpleNamespace(pid=None, type=1, laddr=access, raddr=remote),
-            SimpleNamespace(pid=13, type=1, laddr=access, raddr=SimpleNamespace(
-                ip="192.0.2.21", port=443
-            )),
+            SimpleNamespace(
+                pid=13,
+                type=1,
+                laddr=access,
+                raddr=SimpleNamespace(ip="192.0.2.21", port=443),
+            ),
         ]
         service._updated = -1.0
         assert service.lookup(first) is None
@@ -270,7 +284,9 @@ def test_capabilities_with_simulated_windows(monkeypatch: Any) -> None:
     with monkeypatch.context() as patch:
         patch.setattr(mod.sys, "platform", "win32")
         patch.setattr(
-            mod.ctypes, "WinDLL", lambda _: (_ for _ in ()).throw(OSError()),
+            mod.ctypes,
+            "WinDLL",
+            lambda _: (_ for _ in ()).throw(OSError()),
             raising=False,
         )
         assert capture_capabilities()["npcap_dlls_found"] is False
