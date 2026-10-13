@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp_ns": 1000000000,
+    "src_ip": "192.0.2.10",
+    "src_port": 51000,
+    "dst_ip": "198.51.100.20",
+    "dst_port": 443,
+    "protocol": "TCP",
+    "ip_length_bytes": 60,
+    "tcp_flags": [
+      "SYN"
+    ]
+  },
+  {
+    "timestamp_ns": 1100000000,
+    "src_ip": "198.51.100.20",
+    "src_port": 443,
+    "dst_ip": "192.0.2.10",
+    "dst_port": 51000,
+    "protocol": "TCP",
+    "ip_length_bytes": 100,
+    "tcp_flags": [
+      "SYN",
+      "ACK"
+    ]
+  },
+  {
+    "timestamp_ns": 1200000000,
+    "src_ip": "192.0.2.10",
+    "src_port": 51000,
+    "dst_ip": "198.51.100.20",
+    "dst_port": 443,
+    "protocol": "TCP",
+    "ip_length_bytes": 80,
+    "tcp_flags": [
+      "ACK",
+      "PSH"
+    ]
+  },
+  {
+    "timestamp_ns": 1400000000,
+    "src_ip": "198.51.100.20",
+    "src_port": 443,
+    "dst_ip": "192.0.2.10",
+    "dst_port": 51000,
+    "protocol": "TCP",
+    "ip_length_bytes": 120,
+    "tcp_flags": [
+      "ACK",
+      "FIN"
+    ]
+  }
+]

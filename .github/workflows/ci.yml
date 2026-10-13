@@ -1,8 +1,8 @@
-name: Foundation CI
+name: No Hack CI
 
 on:
   push:
-    branches: [main, phase-00-foundation]
+    branches: [main, 'phase-**']
   pull_request:
     branches: [main]
 
@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  foundation:
+  quality:
     name: Python 3.11 / ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -24,7 +24,7 @@ jobs:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install foundation with dev extras
+      - name: Install with dev extras
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]" -c requirements/dev-py311-constraints.txt
