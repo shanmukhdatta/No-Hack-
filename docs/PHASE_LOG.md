@@ -127,3 +127,36 @@ These local results were supplied in chat by the Windows tester, not independent
 - **Hardware gate remains pending**: the earlier Windows local report does not
   confirm actual Npcap capture or the follow-up code running on the physical
   machine. No merge/Phase 3 acceptance is implied by hosted CI.
+
+### Phase 2 Windows Npcap hardware capture (user-reported, 2026-10-13)
+
+- Native Windows 11, Python 3.11.9, Npcap installed; tested repository SHA
+  `94a58347aa959e9c23c3d877076c45e8da7a8405`.
+- `capture-check` reported `live_capture_ready=true` and
+  `npcap_dlls_found=true`; interface enumeration returned 8 adapters.
+  The user consented to a 10-second capture on their selected Wi-Fi adapter.
+- **PASS on this hardware test:** authorized `capture-demo` exit 0, 15
+  completed flow records, zero active flows after duration timeout,
+  33 ordered NoHackFlow v1 feature keys per JSONL record, finite numbers,
+  matching packet/byte totals, metadata-only output, and no ML verdicts.
+  Local dependencies, Ruff, mypy and build passed. Unit suite passed
+  **76 tests** after correcting a local Windows-specific test assertion.
+- **Important measurement caveat:** recorded `packets_accepted=9321`,
+  `packets_out_of_order=14854`. A large fraction was rejected on the
+  strict global timestamp watermark. This does **not** prove accurate
+  capture completeness despite the 15 valid emitted flow records.
+- Correction on the Phase 2 PR branch: tolerate up to 2 seconds of
+  bounded cross-flow capture timestamp skew after wall-clock expiry ticks,
+  while retaining strict per-flow ordering and dropping genuinely stale
+  events. Add a deterministic regression test.
+- Local test correction: compare `Path(item).name` when simulating
+  Npcap DLL loads; actual Windows installs may load fully qualified paths.
+  Correction committed to PR branch (local Antigravity edit was not pushed).
+- The report called Ctrl+C PASS using a simulated unit test; it did
+  **not** document a physical Ctrl+C interruption. Timeout cleanup was
+  tested on the native device. CPU/RAM observations were qualitative.
+- **Follow-up:** revised lateness semantics and regression need CI, and
+  the actual live `packets_out_of_order` proportion must be retested on
+  a future authorized Windows run (as part of Phase 3 acceptance at
+  latest). Distinguish hardware verification of initial capture from
+  unverified post-review adjustments. No endpoint metadata was uploaded.
