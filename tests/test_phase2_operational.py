@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import time
+from contextlib import nullcontext
 from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
@@ -17,7 +18,7 @@ from nohack.capture.replay import CaptureError, FlowProcessor, replay_pcap
 from nohack.capture.session import CaptureSession, capture_for_duration
 from nohack.collector.flows import FlowManager, ProcessContext
 from nohack.collector.process import ProcessAttributor
-from nohack.features import PacketMeta
+from nohack.features import FEATURE_NAMES, PacketMeta
 
 scapy = pytest.importorskip("scapy.all")
 
@@ -82,6 +83,7 @@ def test_cli_replay_explicit_metadata_export(tmp_path: Path, capsys: Any) -> Non
     row = json.loads(output.read_text().strip())
     assert row["feature_schema_version"] == "nohackflow-v1"
     assert row["features"]["total_packet_count"] == 1
+    assert list(row["features"]) == list(FEATURE_NAMES)
     assert row["process"] is None
     assert "payload" not in row
     assert main(["replay-pcap", "--input", str(capture), "--output", str(output)]) == 3
@@ -303,3 +305,25 @@ def test_cli_interruption_is_controlled(monkeypatch: Any, capsys: Any) -> None:
     )
     assert main(["capture-demo", "--interface", "dummy", "--authorized"]) == 130
     assert "interrupted" in capsys.readouterr().err
+
+
+def test_capabilities_detects_standard_npcap_layout(
+    monkeypatch: Any, tmp_path: Path
+) -> None:
+    import nohack.capture.capabilities as mod
+
+    dll_dir = tmp_path / "System32" / "Npcap"
+    dll_dir.mkdir(parents=True)
+    for name in ("Packet.dll", "wpcap.dll"):
+        (dll_dir / name).write_bytes(b"synthetic-dll-fixture")
+    loaded: list[str] = []
+    with monkeypatch.context() as patch:
+        patch.setattr(mod.sys, "platform", "win32")
+        patch.setenv("SystemRoot", str(tmp_path))
+        patch.setattr(
+            mod.os, "add_dll_directory", lambda _: nullcontext(), raising=False
+        )
+        patch.setattr(mod.ctypes, "WinDLL", loaded.append, raising=False)
+        status = mod.capture_capabilities()
+    assert status["npcap_dlls_found"] is True
+    assert loaded == [str(dll_dir / "Packet.dll"), str(dll_dir / "wpcap.dll")]
