@@ -281,7 +281,7 @@ def test_capabilities_with_simulated_windows(monkeypatch: Any) -> None:
         patch.setattr(mod.sys, "platform", "win32")
         patch.setattr(mod.ctypes, "WinDLL", loaded.append, raising=False)
         report = capture_capabilities()
-    assert loaded == ["wpcap.dll", "Packet.dll"]
+    assert loaded == ["Packet.dll", "wpcap.dll"]
     assert report["npcap_dlls_found"] is True
     with monkeypatch.context() as patch:
         patch.setattr(mod.sys, "platform", "win32")
