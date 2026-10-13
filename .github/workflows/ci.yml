@@ -1,0 +1,48 @@
+name: Foundation CI
+
+on:
+  push:
+    branches: [main, phase-00-foundation]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  foundation:
+    name: Python 3.11 / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install foundation with dev extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]" -c requirements/dev-py311-constraints.txt
+      - name: Ruff lint
+        run: python -m ruff check .
+      - name: Ruff format check
+        run: python -m ruff format --check .
+      - name: Mypy
+        run: python -m mypy src/nohack
+      - name: Pytest with coverage
+        run: python -m pytest --cov=nohack --cov-report=term-missing --cov-fail-under=85
+      - name: Build sdist and wheel
+        if: runner.os == 'Linux'
+        run: python -m build
+      - name: Wheel smoke check
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          python -m pip install --force-reinstall --no-deps dist/*.whl
+          python -c "import nohack; print(nohack.__version__)"
+          nohack doctor
