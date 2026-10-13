@@ -86,3 +86,32 @@ These local results were supplied in chat by the Windows tester, not independent
 - GitHub-hosted Windows: **75 passed**, branch-aware **89.11% coverage**, Ruff lint/format pass and strict mypy (33 files) pass. This is an unprivileged Windows CI runner and **does not prove Npcap driver/interface operation**.
 - No actual Windows hardware Npcap test has been completed yet; Antigravity user-device installation, interface enumeration, authorized live traffic demo, JSONL inspection, Ctrl+C drain, CPU/memory and privacy checks remain **PENDING**.
 - A documentation-only commit following the source commit must be checked separately in CI. PR review remains **pending user approval**; main is not to be changed without approval.
+
+### Phase 2 local Windows Antigravity verification (user-provided, 2026-10-13)
+
+- Machine reported: Windows 11 x64; Python 3.11.9, Scapy 2.8.0,
+  psutil 7.2.2; validated branch at `5b89192bbc4c2ea1045a03c690a9dbef6a5f704f`.
+  These are **reported user-device results**, not independently executed
+  on that machine by the assistant or GitHub Actions.
+- `pip install -e ".[dev,capture]"` succeeded; `nohack doctor` remained
+  foundation-only (capture/model inactive).
+- Local pytest **75 passed**, **89.11%** branch-aware coverage;
+  Ruff lint/format, strict mypy and sdist/wheel build all passed.
+- Authorized synthetic seven-packet TCP PCAP replay **PASS**:
+  one completed flow with 33 feature fields, total packet count 7
+  (forward 4 / backward 3), 296 IP bytes, 300ms duration,
+  expected TCP flags, no payload fields, no ML inference and
+  a shutdown-completed record. The test checked feature name equality
+  but did not independently prove JSON key serialization order.
+- `nohack capture-check` reported `npcap_dlls_found: false` and
+  `live_capture_ready: false`. Interface listing and real capture
+  could not proceed: **Npcap driver missing on local machine**.
+  Native interface capture, live graceful Ctrl+C, and live CPU/memory
+  bounds remain **PENDING**, not PASS.
+- Subsequent review added an explicit regression test for serialized
+  feature ordering, fixed the JSONL writer to retain canonical order,
+  and made Npcap readiness probing support the standard
+  `System32/Npcap` installation (without WinPcap compatibility).
+  These changes postdate the local report and require their own CI
+  checks and subsequent Windows hardware smoke verification.
+- Phase 2 merge approval and start of Phase 3: **not granted**.
