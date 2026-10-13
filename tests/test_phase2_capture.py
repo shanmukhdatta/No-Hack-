@@ -10,16 +10,15 @@ from typing import Any
 
 import pytest
 
-scapy = pytest.importorskip("scapy.all")
-
 from nohack.capture.capabilities import capture_capabilities
-from nohack.capture.commands import run_capture_command
 from nohack.capture.normalizer import normalize_scapy
 from nohack.capture.replay import CaptureError, FlowProcessor, replay_pcap
 from nohack.capture.session import CaptureSession
 from nohack.collector.flows import FlowLimits, FlowManager
 from nohack.collector.process import ProcessAttributor
 from nohack.features import FEATURE_NAMES, PacketMeta
+
+scapy = pytest.importorskip("scapy.all")
 
 
 def tcp(
