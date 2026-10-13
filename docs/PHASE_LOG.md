@@ -77,3 +77,12 @@ These local results were supplied in chat by the Windows tester, not independent
 - Normalization and lifecycle contract: documented in `docs/PHASE2_CAPTURE.md`; 33 NoHackFlow v1 model features unchanged.
 - **Acceptance: pending.** CI and actual Windows/Npcap interface verification must be recorded with commit-specific evidence. Initial CI attempts reported formatting/import issues and were corrected on the branch; do not mistake them for successful checks.
 - Phase 3 handoff: consume `FlowProcessor`, `FlowManager`, `CompletedFlow` and `CaptureSession` without introducing a second feature schema. Runtime service orchestration, persistence and inference are later phases.
+
+### Phase 2 GitHub Actions evidence (2026-10-13)
+
+- Source commit: `ba5f139761ef3828f810c976f43285abcfc52420`.
+- GitHub Actions: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38446940900 — both Python 3.11 jobs **PASS**.
+- Linux: **75 passed**, branch-aware **89.02% coverage**, Ruff lint and format pass, strict mypy (33 files) pass, source and wheel build pass, wheel smoke pass.
+- GitHub-hosted Windows: **75 passed**, branch-aware **89.11% coverage**, Ruff lint/format pass and strict mypy (33 files) pass. This is an unprivileged Windows CI runner and **does not prove Npcap driver/interface operation**.
+- No actual Windows hardware Npcap test has been completed yet; Antigravity user-device installation, interface enumeration, authorized live traffic demo, JSONL inspection, Ctrl+C drain, CPU/memory and privacy checks remain **PENDING**.
+- A documentation-only commit following the source commit must be checked separately in CI. PR review remains **pending user approval**; main is not to be changed without approval.
