@@ -68,7 +68,8 @@ create or retain a payload-bearing capture file**.
 
 `FlowLimits` defaults: **30-second idle timeout**, **120-second maximum
 flow lifetime**, **1-second grace after both TCP FIN directions**, **4096
-maximum simultaneous flows**. Limits can be injected into the processor
+maximum simultaneous flows**, and **2-second maximum tolerated capture timestamp
+lateness** relative to the global watermark. Limits can be injected into the processor
 without changing the schema.
 
 - First-observed 5-tuple orientation defines forward and reverse.
@@ -80,8 +81,14 @@ without changing the schema.
 - Flow expiration, bounded-capacity eviction, TCP reuse, RST and explicit
   shutdown all return validated `CompletedFlow` snapshots. No unbounded
   history list is retained by the flow manager.
-- Out-of-order arrivals are rejected and counted, not reordered to fabricate
-  timing. TCP sequence numbers are not tracked; therefore this is not full
+- Packets earlier than the last accepted event **within the same flow** are
+  rejected; cross-flow timestamp skew and small capture-to-callback lag are
+  tolerated up to the configured 2-second limit. Packets beyond that global
+  lateness bound are rejected and counted. Live expiration ticks run on wall
+  time, which can lead capture timestamps by milliseconds. There is no
+  reordering or fabrication of timing. Check the discarded-packet count under
+  real load before deploying a longer-running pipeline. TCP sequence numbers
+  are not tracked; therefore this is not full
   TCP session reconstruction. A reused tuple with no observable SYN can be
   bounded by idle/max-lifetime expiration, but not separated perfectly.
 - `FlowManager` is intentionally single-threaded; `CaptureSession` serializes
