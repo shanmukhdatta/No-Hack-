@@ -153,10 +153,7 @@ class FlowManager:
         if state is not None and packet.timestamp_ns < state.last_ns:
             self.counters.out_of_order += 1
             return []
-        if (
-            packet.timestamp_ns + self.limits.max_packet_lateness_ns
-            < self.watermark_ns
-        ):
+        if packet.timestamp_ns + self.limits.max_packet_lateness_ns < self.watermark_ns:
             # Ignore genuinely stale arrivals, not normal cross-flow jitter.
             # Expiration ticks use wall time and can exceed packet timestamps
             # by milliseconds even on healthy Windows/Npcap hosts.
