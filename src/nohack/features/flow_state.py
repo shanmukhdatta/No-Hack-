@@ -144,8 +144,7 @@ class FlowAccumulator:
 
         if self._lengths.count:
             self._iats.add(
-                (packet.timestamp_ns - self._ended_ns)
-                / NANOSECONDS_PER_MILLISECOND
+                (packet.timestamp_ns - self._ended_ns) / NANOSECONDS_PER_MILLISECOND
             )
         self._ended_ns = packet.timestamp_ns
         self._lengths.add(float(packet.ip_length_bytes))
@@ -180,6 +179,7 @@ class FlowAccumulator:
         duration_s = duration_ns / NANOSECONDS_PER_SECOND
         packets = self._forward_packets + self._backward_packets
         byte_count = self._forward_bytes + self._backward_bytes
+
         def per_second(count: int) -> float:
             return count / duration_s if duration_s > 0 else 0.0
 
