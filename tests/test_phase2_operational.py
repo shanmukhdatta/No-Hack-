@@ -301,7 +301,5 @@ def test_cli_interruption_is_controlled(monkeypatch: Any, capsys: Any) -> None:
         "capture_for_duration",
         lambda *args: (_ for _ in ()).throw(KeyboardInterrupt()),
     )
-    assert main([
-        "capture-demo", "--interface", "dummy", "--authorized"
-    ]) == 130
+    assert main(["capture-demo", "--interface", "dummy", "--authorized"]) == 130
     assert "interrupted" in capsys.readouterr().err
