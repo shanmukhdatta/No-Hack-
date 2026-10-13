@@ -160,3 +160,18 @@ These local results were supplied in chat by the Windows tester, not independent
   a future authorized Windows run (as part of Phase 3 acceptance at
   latest). Distinguish hardware verification of initial capture from
   unverified post-review adjustments. No endpoint metadata was uploaded.
+
+### Phase 2 Windows fix and final source CI (2026-10-13)
+
+- Source commit: `92b7c2d9c6f9dea2f6cb4c3cedf1684cf48d7574`.
+- PR CI run: https://github.com/shanmukhdatta/No-Hack-/actions/runs/38451915896
+  — Linux **PASS** (77 tests, **89.13%** coverage, Ruff lint/format,
+  mypy, wheel/sdist smoke) and Windows **PASS** (77 tests, **89.23%**
+  coverage, Ruff lint/format, mypy).
+- Includes Windows-specific DLL test portability fix, bounded 2s
+  cross-flow timestamp tolerance and explicit regression tests.
+- Physical Wi-Fi/Npcap capture was user-reported at earlier
+  `94a58347aa959e9c23c3d877076c45e8da7a8405` before this fix;
+  post-fix live packet-rejection rate is **not yet measured**.
+  Carry that measurement into Phase 3 as an explicit follow-up gate;
+  do not claim zero packet loss or hardware re-verification of new code.
