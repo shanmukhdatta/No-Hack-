@@ -30,7 +30,9 @@ def normalize_scapy(packet: Any) -> PacketMeta | None:
     try:
         scapy = importlib.import_module("scapy.all")
     except ImportError as exc:
-        raise RuntimeError("Install the optional capture extra: nohack[capture]") from exc
+        raise RuntimeError(
+            "Install the optional capture extra: nohack[capture]"
+        ) from exc
 
     ip4 = packet.getlayer(scapy.IP)
     ip6 = packet.getlayer(scapy.IPv6)
@@ -74,9 +76,7 @@ def normalize_scapy(packet: Any) -> PacketMeta | None:
     if isinstance(transport, scapy.TCP):
         protocol = "TCP"
         src_port, dst_port = int(transport.sport), int(transport.dport)
-        flags = frozenset(
-            name for name, bit in _TCP_BITS if int(transport.flags) & bit
-        )
+        flags = frozenset(name for name, bit in _TCP_BITS if int(transport.flags) & bit)
     elif isinstance(transport, scapy.UDP):
         protocol = "UDP"
         src_port, dst_port = int(transport.sport), int(transport.dport)
@@ -92,8 +92,9 @@ def normalize_scapy(packet: Any) -> PacketMeta | None:
     try:
         # Decimal(str(...)) avoids binary float multiplication drift; ties-to-even.
         timestamp_ns = int(
-            (Decimal(str(packet.time)) * Decimal(1_000_000_000))
-            .to_integral_value(rounding=ROUND_HALF_EVEN)
+            (Decimal(str(packet.time)) * Decimal(1_000_000_000)).to_integral_value(
+                rounding=ROUND_HALF_EVEN
+            )
         )
     except (InvalidOperation, TypeError, ValueError, OverflowError) as exc:
         raise ValueError("Invalid packet capture timestamp") from exc
