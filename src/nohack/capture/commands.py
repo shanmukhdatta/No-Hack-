@@ -64,7 +64,7 @@ def _summary(processor: FlowProcessor, delivered: int) -> dict[str, object]:
 def _record_writer(stream: TextIO | None) -> Callable[[CompletedFlow], None]:
     def write(record: CompletedFlow) -> None:
         if stream is not None:
-            stream.write(json.dumps(record.to_dict(), sort_keys=True) + "\n")
+            # Preserve the canonical FEATURE_NAMES insertion order in JSONL.\n            stream.write(json.dumps(record.to_dict()) + "\n")
 
     return write
 
