@@ -76,3 +76,7 @@ Run from a clean clone with Python 3.11 and no administrator privileges:
 
 GitHub CI and these Windows checks must pass before merging. Npcap, Kaggle
 and model downloads are not needed for Phase 1.
+
+## Phase 2 integration note
+
+The Phase 2 Scapy packet normalizer is now the only packet-header-to-PacketMeta adapter used by both local PCAP replay and live Npcap ingestion. It uses integer-ns capture timestamps rounded with decimal ties-to-even arithmetic, IPv4 total lengths and IPv6 40+payload lengths. Unsupported fragments and protocols are skipped. The 33-column NoHackFlow v1 schema is unchanged. The flow manager enforces ordering and bounded TCP/UDP lifecycles before calling the existing Phase 1 `FlowAccumulator`. Process metadata and interface identifiers are non-model context. See [PHASE2_CAPTURE.md](PHASE2_CAPTURE.md) for implementation and device-verification limits.
