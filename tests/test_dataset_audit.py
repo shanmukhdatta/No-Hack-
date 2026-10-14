@@ -24,7 +24,10 @@ def test_audit_reports_only_sampled_labels_without_inventing_mapping(
     assert report["sampled_rows"] == 1
     assert report["sampled_labels"] == {"BENIGN": 1}
     assert report["csv_headers"] == [
-        "Label", "Flow Duration", "duration_ms", "Total Fwd Packets"
+        "Label",
+        "Flow Duration",
+        "duration_ms",
+        "Total Fwd Packets",
     ]
     assert report["exact_header_overlap_only"] == ["duration_ms"]
     assert report["deployable_mapping_verified"] is False
