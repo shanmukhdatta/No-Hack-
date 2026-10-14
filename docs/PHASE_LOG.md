@@ -175,3 +175,7 @@ These local results were supplied in chat by the Windows tester, not independent
   post-fix live packet-rejection rate is **not yet measured**.
   Carry that measurement into Phase 3 as an explicit follow-up gate;
   do not claim zero packet loss or hardware re-verification of new code.
+
+## Phase 3 proposed (not yet accepted)
+
+A bounded observation pipeline and local replay-to-SQLite implementation are under test. Do not treat this section as passing or complete until CI and Windows validation evidence is recorded.
