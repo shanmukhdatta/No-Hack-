@@ -60,3 +60,9 @@ Default API host is 127.0.0.1. The collector requires explicit permission and au
 ## Phase 2 implementation boundary
 
 The Phase 2 `capture.normalizer` accepts Scapy packets and returns only validated `PacketMeta` values. `collector.flows.FlowManager` owns bounded canonical bidirectional flow state and emits immutable NoHackFlow snapshots. The same `capture.replay.FlowProcessor` handles PCAP and live callback traffic. `capture.session.CaptureSession` isolates Npcap/AsyncSniffer from the rest of the application and never starts without explicit user action. `collector.process.ProcessAttributor` supplies optional process metadata, outside the 33 model features. Timeouts, resource limits, and the Phase 3 callback contract are defined in [PHASE2_CAPTURE.md](PHASE2_CAPTURE.md). No ML inference is introduced.
+
+## Chrome-first interface amendment (2026-10-14)
+
+The Chrome extension is the normal user's primary interface. It observes top-level HTTP/HTTPS **navigation URL metadata only** and persists at most hostname, scheme, review indicator and timestamp when opted in. It does not see full OS traffic, website contents or encrypted payloads. Its simple deterministic site indicators are explicitly distinct from ML outputs.
+
+The Windows Npcap/Scapy agent is an optional, separately installed companion with the full NoHackFlow v1 feature contract. Native Messaging is used for a restricted, origin-allowlisted status bridge. The initial host accepts only read-only ping/status; starting live capture, streaming authorized flow information and using trained ML requires later reviewed integration. See docs/CHROME_EXTENSION.md.
