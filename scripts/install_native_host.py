@@ -52,7 +52,9 @@ def main(argv: list[str] | None = None) -> int:
     import winreg
 
     key_path = rf"Software\Google\Chrome\NativeMessagingHosts\{HOST_NAME}"
-    with winreg.CreateKeyEx(winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE) as key:
+    with winreg.CreateKeyEx(
+        winreg.HKEY_CURRENT_USER, key_path, 0, winreg.KEY_SET_VALUE
+    ) as key:
         winreg.SetValueEx(key, None, 0, winreg.REG_SZ, str(destination))
     print(f"Registered {HOST_NAME} for this Windows user")
     print(f"Manifest: {destination}")

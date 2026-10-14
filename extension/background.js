@@ -9,7 +9,7 @@ async function snapshot() {
   return {...settings, events: pruneEvents(raw.events ?? [], settings.retentionDays)};
 }
 
-async function saveNavigation(url) {
+async function saveNavigation(url, tabId) {
   const candidate = makeEvent(url);
   if (!candidate) return;
   // Serialize read/modify/write cycles from concurrent navigation events.
@@ -18,9 +18,10 @@ async function saveNavigation(url) {
     if (!state.enabled) return;
     const events = pruneEvents([...state.events, candidate], state.retentionDays);
     await chrome.storage.local.set({events});
-    if (state.alerts && candidate.level === "REVIEW" && candidate.scheme === "http") {
-      await chrome.action.setBadgeText({text: "!", tabId: undefined});
-      await chrome.action.setBadgeBackgroundColor({color: "#B45309"});
+    if (Number.isInteger(tabId) && tabId >= 0) {
+      const warn = state.alerts && candidate.level === "REVIEW" && candidate.scheme === "http";
+      await chrome.action.setBadgeText({text: warn ? "!" : "", tabId});
+      if (warn) await chrome.action.setBadgeBackgroundColor({color: "#B45309", tabId});
     }
   });
   await serial;
@@ -34,7 +35,7 @@ chrome.runtime.onInstalled.addListener(async () => {
 });
 
 chrome.webNavigation.onCommitted.addListener(details => {
-  if (details.frameId === 0) void saveNavigation(details.url);
+  if (details.frameId === 0) void saveNavigation(details.url, details.tabId);
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
