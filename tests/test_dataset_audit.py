@@ -11,11 +11,14 @@ from nohack.datasets.csv_audit import audit_csv, sha256_file
 from nohack.features import schema_fingerprint
 
 
-def test_audit_reports_only_sampled_labels_without_inventing_mapping(tmp_path: Path) -> None:
+def test_audit_reports_only_sampled_labels_without_inventing_mapping(
+    tmp_path: Path,
+) -> None:
     source = tmp_path / "sample.csv"
     source.write_text(
         "\ufeff Label ,Flow Duration,duration_ms,Total Fwd Packets\n"
-        "BENIGN,10,20,1\nAttack,30,40,2\n", encoding="utf-8"
+        "BENIGN,10,20,1\nAttack,30,40,2\n",
+        encoding="utf-8",
     )
     report = audit_csv(source, sample_rows=1)
     assert report["sampled_rows"] == 1
@@ -33,7 +36,8 @@ def test_audit_reports_only_sampled_labels_without_inventing_mapping(tmp_path: P
 def test_duplicate_headers_bad_rows_and_absent_label(tmp_path: Path) -> None:
     source = tmp_path / "sample.csv"
     source.write_text(
-        "Some, some,Label,LABEL\n1,2,x,y\nnot-enough\n", encoding="utf-8"
+        "Some, some,Label,LABEL\n1,2,x,y\nnot-enough\n",
+        encoding="utf-8",
     )
     report = audit_csv(source)
     assert report["duplicate_normalized_headers"] == ["label", "some"]
