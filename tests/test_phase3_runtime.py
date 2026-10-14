@@ -8,7 +8,6 @@ from typing import Any
 
 import pytest
 
-from nohack.capture.replay import FlowProcessor
 from nohack.collector.flows import FlowManager
 from nohack.features import PacketMeta
 from nohack.runtime.pipeline import replay_to_database
