@@ -46,3 +46,21 @@ jobs:
           python -m pip install --force-reinstall --no-deps dist/*.whl
           python -c "import nohack; print(nohack.__version__)"
           nohack doctor
+
+  extension:
+    name: Chrome MV3 / Node 22
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check browser JS syntax
+        run: |
+          node --check extension/background.js
+          node --check extension/ui.js
+          node --check extension/logic.mjs
+      - name: Browser logic tests
+        run: node --test extension/tests/*.test.mjs
+      - name: Validate Chrome manifest
+        run: node -e "const m=require('./extension/manifest.json'); if(m.manifest_version!==3 || !m.background?.service_worker) process.exit(1)"

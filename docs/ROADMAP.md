@@ -35,3 +35,9 @@ Every phase: inspect the prior branch/commit, implement reusable source and test
 ## Historical README mapping
 
 The original README's phases 1–5 map mainly to current phases 4–8, its modern feature/collector work maps to 1–2, inference maps to 9, API/storage maps to 9–10, UI to 11, monitoring to 12, and packaging/release to 13–14. This is a sequencing change, not a feature deletion.
+
+## Chrome-first product correction (2026-10-14)
+
+The Chrome Manifest V3 extension is now the primary customer-facing entry point; Windows NoHackFlow capture + hybrid ML is an **optional separately installed companion**, not a capability of Chrome by itself. A standalone extension performs transparent browser URL-scheme/domain indicators, opt-in local hostname-only history, privacy controls and a companion availability check; it must not claim malware detection or network-wide monitoring. The optional PySide6 dashboard is retained for future Windows-specific users, not the required primary UI.
+
+To preserve the existing 15-phase tracking, add the Chrome extension UI, history, popup, full dashboard, Native Messaging and browser tests as a separate cross-phase product workstream spanning Phases 3, 10, 11, 13–14. Do not mark those phases complete because the Chrome MVP exists. Full hybrid ML training, release, authorized real Windows device validation and Chrome Web Store review are separate gates.
