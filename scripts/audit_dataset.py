@@ -17,11 +17,7 @@ def main() -> int:
     parser.add_argument("--output", type=Path, help="Optional local report path")
     args = parser.parse_args()
 
-    files = (
-        sorted(args.input.rglob("*.csv"))
-        if args.input.is_dir()
-        else [args.input]
-    )
+    files = sorted(args.input.rglob("*.csv")) if args.input.is_dir() else [args.input]
     if not files or len(files) > 50:
         parser.error("Expected 1 to 50 CSV files")
     try:
