@@ -32,7 +32,8 @@ def read_message(stream: BinaryIO) -> object | None:
     if len(payload) != length:
         raise ValueError("Incomplete native message body")
     try:
-        return json.loads(payload.decode("utf-8"))
+        parsed: object = json.loads(payload.decode("utf-8"))
+        return parsed
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise ValueError("Invalid JSON native message") from exc
 
