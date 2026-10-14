@@ -29,6 +29,11 @@ def register_capture_commands(subparsers: Any) -> None:
     )
     replay.add_argument("--input", type=Path, required=True)
     replay.add_argument("--output", type=Path)
+    replay_store = subparsers.add_parser(
+        "replay-store", help="Persist authorized PCAP flow observations to SQLite"
+    )
+    replay_store.add_argument("--input", type=Path, required=True)
+    replay_store.add_argument("--database", type=Path, required=True)
     demo = subparsers.add_parser(
         "capture-demo", help="Capture authorized local metadata for a short interval"
     )
@@ -82,6 +87,12 @@ def run_capture_command(args: argparse.Namespace) -> int:
             raise CaptureError(
                 "Explicit --authorized consent is required for monitored traffic"
             )
+        if args.command == "replay-store":
+            from nohack.runtime.pipeline import replay_to_database
+
+            report = replay_to_database(args.input, args.database)
+            print(json.dumps(report, sort_keys=True))
+            return 0
         processor = _processor(enrich_processes=args.command == "capture-demo")
         delivered = 0
         with ExitStack() as stack:
