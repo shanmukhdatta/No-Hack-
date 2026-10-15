@@ -100,7 +100,6 @@ def prepare_dataset(
             if x != y and set(splits[x]["group_id"]) & set(splits[y]["group_id"]):
                 raise RuntimeError("Group leakage detected")
     # Exact duplicate feature vectors can leak across provenance groups.
-    import pandas.util
     feature_hashes = {
         name: set(pd.util.hash_pandas_object(df[list(FEATURE_NAMES)], index=False).tolist())
         for name, df in splits.items()
