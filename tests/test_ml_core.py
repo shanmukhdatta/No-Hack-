@@ -1,4 +1,5 @@
 """Synthetic end-to-end ML smoke: never represent fixture metrics as accuracy."""
+# ruff: noqa: E402  # Skip optional dependencies before importing ML modules.
 from __future__ import annotations
 
 import json
