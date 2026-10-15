@@ -10,7 +10,7 @@ from typing import Any, Self
 ALLOWED_STATES = {"NORMAL", "KNOWN_THREAT", "NOVEL_ANOMALY", "UNCERTAIN"}
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS flow_predictions (
-    observation_id INTEGER PRIMARY KEY REFERENCES flow_observations(id),
+    observation_id INTEGER PRIMARY KEY REFERENCES flow_observations(id) ON DELETE CASCADE,
     state TEXT NOT NULL CHECK (
         state IN ('NORMAL', 'KNOWN_THREAT', 'NOVEL_ANOMALY', 'UNCERTAIN')
     ),
@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS flow_predictions (
     known_threat_probability REAL NOT NULL,
     anomaly_percentile REAL NOT NULL,
     model_disagreement REAL NOT NULL,
+    attack_family TEXT,
+    attack_family_confidence REAL,
     top_reasons TEXT NOT NULL,
     feature_schema_version TEXT NOT NULL,
     model_sha256 TEXT NOT NULL,
@@ -73,13 +75,15 @@ class PredictionStore:
             """
             INSERT INTO flow_predictions (
                 observation_id, state, risk_score, known_threat_probability,
-                anomaly_percentile, model_disagreement, top_reasons,
-                feature_schema_version, model_sha256
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                anomaly_percentile, model_disagreement, attack_family, attack_family_confidence,
+                top_reasons, feature_schema_version, model_sha256
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 observation_id, result["state"], result["risk_score"],
                 result["known_threat_probability"], result["anomaly_percentile"],
-                result["model_disagreement"], json.dumps(result["top_reasons"]),
+                result["model_disagreement"], result.get("attack_family"),
+                result.get("attack_family_confidence"),
+                json.dumps(result["top_reasons"]),
                 result["feature_schema_version"], model_sha256,
             )
         )
@@ -94,7 +98,7 @@ def recent_assessments(database: Path, limit: int = 10) -> list[dict[str, Any]]:
         with sqlite3.connect(uri, uri=True, timeout=1) as db:
             rows = db.execute(
                 """
-                SELECT p.state, p.risk_score, p.created_at_utc, p.top_reasons
+                SELECT p.state, p.risk_score, p.created_at_utc, p.top_reasons, p.attack_family
                 FROM flow_predictions p
                 JOIN flow_observations o ON o.id = p.observation_id
                 ORDER BY p.observation_id DESC LIMIT ?
@@ -104,6 +108,7 @@ def recent_assessments(database: Path, limit: int = 10) -> list[dict[str, Any]]:
         return []
     return [
         {"state": state, "risk_score": risk,
-         "observed_at": timestamp, "reasons": json.loads(reasons)}
-        for state, risk, timestamp, reasons in rows
+         "observed_at": timestamp, "reasons": json.loads(reasons),
+         "attack_family": family}
+        for state, risk, timestamp, reasons, family in rows
     ]
