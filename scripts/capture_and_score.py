@@ -14,7 +14,7 @@ from nohack.capture.session import CaptureSession, capture_for_duration
 from nohack.collector.flows import CompletedFlow
 from nohack.storage.observations import ObservationStore
 
-from scripts.score_observations import score_database
+from nohack.inference.scoring import score_database
 
 
 def run_authorized_capture(
