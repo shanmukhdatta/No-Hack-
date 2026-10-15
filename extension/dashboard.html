@@ -37,7 +37,9 @@
       <h3>Optional Windows network-flow companion</h3>
       <p class="muted">The companion requires a separate authorized installation and Npcap. Connected status means protocol communication succeeds—not that the ML detector is trained or operational.</p>
       <p id="companion-result" class="muted">Not checked.</p>
-      <button id="check-companion" class="button">Check companion</button>
+      <button id="check-companion" class="button">Refresh local assessments</button>
+      <p class="muted small">Assessments represent local network flows, not the security of the active website. They appear only after authorized capture, model training and local scoring.</p>
+      <div id="ml-assessments" class="events" aria-live="polite"></div>
     </section>
     <section data-panel="settings" class="panel hidden">
       <h3>Settings & privacy</h3>
