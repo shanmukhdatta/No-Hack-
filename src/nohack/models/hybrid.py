@@ -11,7 +11,6 @@ from sklearn.mixture import GaussianMixture
 from sklearn.preprocessing import RobustScaler
 
 from nohack.features import FEATURE_NAMES
-from nohack.features.flow_schema import PROTOCOLS
 
 NUMERICAL = [name for name in FEATURE_NAMES if name != "protocol"]
 PROTOCOL_ORDER = ("TCP", "UDP", "ICMP", "ICMPV6")
