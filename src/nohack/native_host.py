@@ -10,9 +10,11 @@ from __future__ import annotations
 import json
 import struct
 import sys
+from pathlib import Path
 from typing import BinaryIO
 
 from nohack.capture.capabilities import capture_capabilities
+from nohack.storage.predictions import recent_assessments
 
 MAX_REQUEST_BYTES = 65_536
 MAX_RESPONSE_BYTES = 1_048_576
@@ -53,6 +55,14 @@ def handle_message(value: object) -> dict[str, object]:
     request_type = value.get("type")
     if request_type == "ping":
         return {"ok": True, "protocol_version": 1, "name": "No Hack companion"}
+    if request_type == "recent_assessments":
+        # Fixed per-user location; the extension may not supply arbitrary file paths.
+        database = Path.home() / ".nohack" / "observations.db"
+        return {
+            "ok": True,
+            "scope": "local_network_flows_not_browser_tabs",
+            "assessments": recent_assessments(database, limit=10),
+        }
     if request_type == "status":
         return {
             "ok": True,
