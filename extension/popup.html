@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>No Hack</title>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="ui.js"></script>
+</head>
+<body class="popup">
+  <main class="shell">
+    <header class="header"><div class="logo" aria-hidden="true">N</div>
+      <div><h1>No Hack</h1><p>Browser security signals</p></div>
+      <button id="open-dashboard" class="icon-button" title="Open full dashboard" aria-label="Open full dashboard">↗</button>
+    </header>
+    <div id="message" role="status" aria-live="polite" class="notice hidden"></div>
+    <section class="panel hero">
+      <div class="spread"><span class="eyebrow">Browser monitoring</span><span id="monitor-label" class="tag">Off</span></div>
+      <h2 id="current-host">Current page</h2>
+      <div class="spread"><span id="current-level" class="signal">Checking…</span>
+      <button id="monitor-toggle" class="button primary">Enable</button></div>
+      <p id="current-explanation" class="muted">Checking the active tab's URL metadata.</p>
+    </section>
+    <nav class="tabs" aria-label="Views">
+      <button class="tab selected" data-view="overview" aria-current="page">Overview</button>
+      <button class="tab" data-view="activity">Activity</button>
+      <button class="tab" data-view="companion">Companion</button>
+      <button class="tab" data-view="settings">Settings</button>
+    </nav>
+    <section data-panel="overview" class="panel">
+      <h3>What this signal means</h3><ul id="reasons" class="reasons"></ul>
+      <p class="muted small">No Hack cannot verify that a website is safe. Browser signals are not ML threat predictions.</p>
+    </section>
+    <section data-panel="activity" class="panel hidden">
+      <div class="spread"><h3>Recent websites</h3><button id="clear-events" class="button subtle">Clear</button></div>
+      <p class="muted small">Only hostnames, protocols, indicators and timestamps are stored locally when enabled.</p>
+      <div id="events" class="events"></div>
+    </section>
+    <section data-panel="companion" class="panel hidden">
+      <h3>Windows companion</h3>
+      <p class="muted">Optional network-flow collection is separate from browser navigation indicators.</p>
+      <p id="companion-result" class="muted">Not checked.</p>
+      <button id="check-companion" class="button">Refresh local assessments</button>
+      <p class="muted small">Flow assessments cannot reliably be assigned to an individual browser tab.</p>
+      <div id="ml-assessments" class="events" aria-live="polite"></div>
+    </section>
+    <section data-panel="settings" class="panel hidden">
+      <h3>Local privacy controls</h3>
+      <label class="choice"><input id="alert-toggle" type="checkbox">Show HTTP warning badge</label>
+      <label class="choice">Keep history <select id="retention"><option value="1">1 day</option><option value="7">7 days</option><option value="14">14 days</option><option value="30">30 days</option></select></label>
+      <p class="muted small">Monitoring starts only after you enable it. Pausing stops new history collection.</p>
+    </section>
+    <footer>Local-first · No website payload collection · v0.1</footer>
+  </main>
+</body>
+</html>

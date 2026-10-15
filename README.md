@@ -1,5 +1,7 @@
 # No Hack
 
+> **Chrome-first clarification (October 2026):** The customer-facing No Hack product includes an opt-in Chrome Manifest V3 extension. The Windows flow collector and ML engine are an optional advanced companion; the PySide6 UI is optional. See [Chrome extension and companion guide](docs/CHROME_EXTENSION.md). Existing README ML features remain planned, not necessarily implemented.
+
 > **AI-Powered Real-Time Network Threat & Anomaly Detection System for Windows**
 
 **No Hack** is an end-to-end defensive cybersecurity + data science + machine learning engineering project that analyzes network-flow behavior on a Windows machine and estimates whether observed traffic is **normal, a known threat, a novel/anomalous pattern, or uncertain**.

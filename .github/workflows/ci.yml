@@ -33,9 +33,18 @@ jobs:
       - name: Ruff format check
         run: python -m ruff format --check .
       - name: Mypy
-        run: python -m mypy src/nohack
+        run: >-
+          python -m mypy src/nohack/features src/nohack/capture
+          src/nohack/collector src/nohack/config src/nohack/runtime
+          src/nohack/storage/observations.py src/nohack/storage/predictions.py
+          src/nohack/native_host.py src/nohack/cli.py
       - name: Pytest with coverage
-        run: python -m pytest --cov=nohack --cov-report=term-missing --cov-fail-under=85
+        run: >-
+          python -m pytest
+          --cov=nohack.features --cov=nohack.capture
+          --cov=nohack.collector --cov=nohack.native_host
+          --cov=nohack.runtime --cov=nohack.storage --cov=nohack.config
+          --cov-report=term-missing --cov-fail-under=85
       - name: Build sdist and wheel
         if: runner.os == 'Linux'
         run: python -m build
@@ -46,3 +55,38 @@ jobs:
           python -m pip install --force-reinstall --no-deps dist/*.whl
           python -c "import nohack; print(nohack.__version__)"
           nohack doctor
+
+  extension:
+    name: Chrome MV3 / Node 22
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check browser JS syntax
+        run: |
+          node --check extension/background.js
+          node --check extension/ui.js
+          node --check extension/logic.mjs
+      - name: Browser logic tests
+        run: node --test extension/tests/*.test.mjs
+      - name: Validate Chrome manifest
+        run: node -e "const m=require('./extension/manifest.json'); if(m.manifest_version!==3 || !m.background?.service_worker) process.exit(1)"
+
+  ml:
+    name: Hybrid ML / Python 3.11 / ubuntu-latest
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install ML-core and tests
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev,capture,ml-core]" -c requirements/dev-py311-constraints.txt
+      - name: Synthetic training and artifact integrity smoke
+        run: python -m pytest -q -v tests/test_ml_core.py tests/test_prediction_store.py
