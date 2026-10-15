@@ -47,6 +47,30 @@ function renderEvents(items) {
   }
 }
 
+function renderAssessments(assessments) {
+  const root = $("ml-assessments");
+  root.replaceChildren();
+  if (!assessments?.length) {
+    const node = document.createElement("p");
+    node.className = "muted small";
+    node.textContent = "No verified local ML assessments available.";
+    root.append(node);
+    return;
+  }
+  const allowed = new Set(["NORMAL", "KNOWN_THREAT", "NOVEL_ANOMALY", "UNCERTAIN"]);
+  for (const assessment of assessments.slice(0, 10)) {
+    if (!allowed.has(assessment?.state)) continue;
+    const item = document.createElement("div");
+    item.className = "event";
+    const risk = Number.isInteger(assessment.risk_score) &&
+      assessment.risk_score >= 0 && assessment.risk_score <= 100
+      ? String(assessment.risk_score) : "unavailable";
+    item.textContent = assessment.state + " · Risk index " + risk +
+      "/100 · " + String(assessment.observed_at || "unknown time");
+    root.append(item);
+  }
+}
+
 function renderCurrent(current) {
   $("current-host").textContent = current.host || "Unsupported or restricted page";
   $("current-level").textContent =
@@ -90,9 +114,12 @@ $("retention").addEventListener("change", () => action(() => send("SET_SETTINGS"
 $("check-companion").addEventListener("click", () => action(async () => {
   const result = await send("COMPANION_STATUS");
   $("companion-result").textContent = result.connected
-    ? "Connected. Capture dependencies: " + (result.capture?.live_capture_ready ? "detected" : "not fully detected") +
-      ". ML detector: not yet released."
+    ? "Companion connected. Capture dependencies: " +
+      (result.capture?.live_capture_ready ? "detected" : "not fully detected") +
+      ". Read-only network-flow assessments are shown below when available."
     : result.reason;
+  const predictions = result.connected ? await send("COMPANION_ASSESSMENTS") : null;
+  renderAssessments(predictions?.assessments || []);
 }));
 if ($("open-dashboard")) $("open-dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 void action(refresh);
