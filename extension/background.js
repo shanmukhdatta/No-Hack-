@@ -61,6 +61,17 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
       case "CLEAR_EVENTS":
         await chrome.storage.local.set({events: []});
         return snapshot();
+      case "COMPANION_ASSESSMENTS": {
+        // Independent local network-flow assessments; never identify browser tabs.
+        try {
+          const result = await chrome.runtime.sendNativeMessage(HOST_NAME, {type: "recent_assessments"});
+          return result?.ok === true && Array.isArray(result.assessments)
+            ? {connected: true, assessments: result.assessments.slice(0, 10)}
+            : {connected: false, assessments: []};
+        } catch {
+          return {connected: false, assessments: []};
+        }
+      }
       case "COMPANION_STATUS":
         // Read-only handshake; never starts capture or returns invented ML risk.
         try {
