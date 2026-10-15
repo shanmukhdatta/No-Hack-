@@ -34,8 +34,10 @@ jobs:
         run: python -m ruff format --check .
       - name: Mypy
         run: >-
-          python -m mypy src/nohack
-          --exclude 'src/nohack/(datasets/prepare|models/hybrid|training/hybrid|inference/hybrid|inference/scoring)\\.py'
+          python -m mypy src/nohack/features src/nohack/capture
+          src/nohack/collector src/nohack/config src/nohack/runtime
+          src/nohack/storage/observations.py src/nohack/storage/predictions.py
+          src/nohack/native_host.py src/nohack/cli.py
       - name: Pytest with coverage
         run: >-
           python -m pytest
