@@ -153,9 +153,51 @@ def train_from_splits(
          (test_prob < known_threshold)).sum()
     )
 
+    # Attack-family classification is a separate, abstaining classifier.
+    family_source = "attack_family" if "attack_family" in train else "label"
+    family_values = train[family_source].astype(str).to_numpy()
+    attack_family_values = family_values[y == 1]
+    family_counts = pd.Series(attack_family_values).value_counts()
+    family_names = sorted(family_counts.index.tolist())
+    family_model = None
+    family_report: dict[str, Any] = {"status": "unavailable"}
+    if len(family_names) >= 2 and (family_counts >= 10).all():
+        from catboost import CatBoostClassifier
+
+        from nohack.models.hybrid import encode_flow
+
+        family_model = CatBoostClassifier(
+            iterations=150, depth=5, learning_rate=0.07,
+            loss_function="MultiClass", verbose=False,
+            thread_count=2, random_seed=seed, allow_writing_files=False,
+        )
+        family_model.fit(
+            encode_flow(_frame(train.iloc[np.where(y == 1)[0]])),
+            attack_family_values,
+        )
+        test_family_source = "attack_family" if "attack_family" in test else "label"
+        test_family = test[test_family_source].astype(str).to_numpy()
+        eligible = (y_test == 1) & np.isin(test_family, family_names)
+        if eligible.any():
+            pred = family_model.predict(
+                encode_flow(_frame(test.iloc[np.where(eligible)[0]]))
+            ).reshape(-1).astype(str)
+            family_report = {
+                "status": "trained", "family_classes": family_names,
+                "evaluated_test_attack_rows": int(eligible.sum()),
+                "macro_f1_on_known_families": float(
+                    f1_score(test_family[eligible], pred, average="macro")
+                ),
+            }
+        else:
+            family_report = {"status": "trained", "family_classes": family_names,
+                             "evaluated_test_attack_rows": 0}
+    metrics["attack_family"] = family_report
+
     output_dir.mkdir(parents=True, exist_ok=True)
     bundle = {
         "base": base, "meta": meta, "calibrator": calibrator,
+        "family_model": family_model,
         "known_threshold": known_threshold,
         "anomaly_threshold": anomaly_threshold,
         "meta_columns": META_COLUMNS,
@@ -173,7 +215,7 @@ def train_from_splits(
         "bundle_sha256": _digest(bundle_path),
         "training_data_manifest_sha256": _digest(data_dir / "manifest.json"),
         "seed": seed, "n_folds": folds, "metrics": metrics,
-        "attack_family_model": "not_trained",
+        "attack_family_model": family_report["status"],
         "model_status": "trained_not_windows_validated",
         "artifact_warning": (
             "joblib contains executable pickle data. Only load bundles you "
