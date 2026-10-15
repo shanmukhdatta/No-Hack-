@@ -12,9 +12,11 @@ import pandas as pd
 from sklearn.model_selection import GroupShuffleSplit
 
 from nohack.features import FEATURE_NAMES, FEATURE_SCHEMA_VERSION, schema_fingerprint
+from nohack.features.flow_schema import FEATURE_SPECS
 
 ALLOWED_LABEL_COLUMNS = ("label", "group_id", "attack_family")
 NUMERIC_FIELDS = tuple(x for x in FEATURE_NAMES if x != "protocol")
+INTEGER_FIELDS = {name for name, kind in FEATURE_SPECS if kind == "int"}
 PROTOCOLS = {"TCP", "UDP", "ICMP", "ICMPV6"}
 
 
@@ -62,7 +64,25 @@ def validate_canonical_table(frame: pd.DataFrame) -> pd.DataFrame:
             raise ValueError(f"Invalid/nonfinite numeric feature: {col}")
         if col.endswith("_port") and (values > 65535).any():
             raise ValueError(f"Invalid port: {col}")
-        result[col] = values
+        if col in INTEGER_FIELDS:
+            if (values != values.round()).any() or (values > 9_000_000_000_000_000).any():
+                raise ValueError(f"Non-integral or oversized integer feature: {col}")
+            result[col] = values.astype("int64")
+        else:
+            result[col] = values.astype("float64")
+    if not (
+        result["forward_packet_count"] + result["backward_packet_count"]
+        == result["total_packet_count"]
+    ).all():
+        raise ValueError("Packet count totals are inconsistent")
+    if not (
+        result["forward_byte_count"] + result["backward_byte_count"]
+        == result["total_byte_count"]
+    ).all():
+        raise ValueError("Byte totals are inconsistent")
+    if (result["protocol"].isin(["ICMP", "ICMPV6"]) &
+        ((result["src_port"] != 0) | (result["dst_port"] != 0))).any():
+        raise ValueError("ICMP flows must not include ports")
     if (result["label"].str.strip().str.upper() == "BENIGN").sum() == 0:
         raise ValueError("At least one verified BENIGN flow required")
     if (result["label"].str.strip().str.upper() != "BENIGN").sum() == 0:
