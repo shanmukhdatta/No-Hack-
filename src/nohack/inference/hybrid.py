@@ -58,6 +58,18 @@ def predict_features(bundle: dict[str, Any], values: dict[str, Any]
         state = "NOVEL_ANOMALY"
     else:
         state = "NORMAL"
+    family = None
+    family_confidence = None
+    if state == "KNOWN_THREAT" and bundle.get("family_model") is not None:
+        from nohack.models.hybrid import encode_flow
+
+        model = bundle["family_model"]
+        family_probs = model.predict_proba(encode_flow(frame))[0]
+        top = int(np.argmax(family_probs))
+        confidence = float(family_probs[top])
+        if confidence >= 0.70:
+            family = str(model.classes_[top])
+            family_confidence = round(confidence, 6)
     signals = summarize_reasons(ordered) if state != "NORMAL" else []
     return {
         "state": state,
@@ -65,7 +77,8 @@ def predict_features(bundle: dict[str, Any], values: dict[str, Any]
         "anomaly_percentile": round(anomaly, 6),
         "risk_score": int(round(100 * max(known, anomaly))),
         "risk_score_is_probability": False,
-        "attack_family": None,
+        "attack_family": family,
+        "attack_family_confidence": family_confidence,
         "model_disagreement": round(disagreement, 6),
         "top_reasons": signals,
         "feature_schema_version": "nohackflow-v1",
