@@ -65,8 +65,10 @@ function renderAssessments(assessments) {
     const risk = Number.isInteger(assessment.risk_score) &&
       assessment.risk_score >= 0 && assessment.risk_score <= 100
       ? String(assessment.risk_score) : "unavailable";
-    item.textContent = assessment.state + " · Risk index " + risk +
-      "/100 · " + String(assessment.observed_at || "unknown time");
+    item.textContent = assessment.state +
+      (assessment.attack_family ? " · Family " + String(assessment.attack_family) : "") +
+      " · Risk index " + risk + "/100 · " +
+      String(assessment.observed_at || "unknown time");
     root.append(item);
   }
 }
