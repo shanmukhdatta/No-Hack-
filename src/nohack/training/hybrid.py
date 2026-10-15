@@ -3,6 +3,7 @@
 Only use verified canonical flow records; public CICFlowMeter CSVs are NOT
 directly compatible with the 33-field NoHackFlow v1 schema.
 """
+
 from __future__ import annotations
 
 import json
@@ -14,8 +15,13 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
-    average_precision_score, brier_score_loss, confusion_matrix, f1_score,
-    precision_score, recall_score, roc_auc_score,
+    average_precision_score,
+    brier_score_loss,
+    confusion_matrix,
+    f1_score,
+    precision_score,
+    recall_score,
+    roc_auc_score,
 )
 from sklearn.model_selection import GroupKFold, GroupShuffleSplit
 
@@ -83,7 +89,9 @@ def _dataset_parts(folder: Path) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFra
 
 
 def _meta_probability(
-    base: HybridBase, meta: LogisticRegression, cal: LogisticRegression,
+    base: HybridBase,
+    meta: LogisticRegression,
+    cal: LogisticRegression,
     frame: pd.DataFrame,
 ) -> tuple[np.ndarray, np.ndarray]:
     features = base.meta_features(frame)
@@ -93,7 +101,11 @@ def _meta_probability(
 
 
 def train_from_splits(
-    data_dir: Path, output_dir: Path, *, seed: int = 42, folds: int = 4,
+    data_dir: Path,
+    output_dir: Path,
+    *,
+    seed: int = 42,
+    folds: int = 4,
     max_false_positive_rate: float = 0.02,
 ) -> dict[str, Any]:
     """Train only on train folds, calibrate and tune on separate validation groups."""
@@ -107,8 +119,9 @@ def train_from_splits(
     oof = np.full((len(train), len(META_COLUMNS)), np.nan)
     splitter = GroupKFold(n_splits=folds)
     for fold, (fit_idx, predict_idx) in enumerate(splitter.split(train, y, groups)):
-        fitted = train_hybrid_base(_frame(train.iloc[fit_idx]), y[fit_idx],
-                                   seed=seed + fold)
+        fitted = train_hybrid_base(
+            _frame(train.iloc[fit_idx]), y[fit_idx], seed=seed + fold
+        )
         oof[predict_idx] = fitted.meta_features(_frame(train.iloc[predict_idx]))
     if not np.isfinite(oof).all():
         raise RuntimeError("Missing OOF predictions")
@@ -116,7 +129,7 @@ def train_from_splits(
     meta.fit(oof, y)
     base = train_hybrid_base(_frame(train), y, seed=seed)
     # Keep calibration and threshold-selection groups disjoint.
-    validator = GroupShuffleSplit(n_splits=1, test_size=0.5, random_state=seed+3)
+    validator = GroupShuffleSplit(n_splits=1, test_size=0.5, random_state=seed + 3)
     calibration_idx, policy_idx = next(
         validator.split(validation, groups=validation["group_id"])
     )
@@ -132,9 +145,7 @@ def train_from_splits(
     policy_prob, policy_features = _meta_probability(
         base, meta, calibrator, _frame(policy_frame)
     )
-    known_threshold = _choose_threshold(
-        y_policy, policy_prob, max_false_positive_rate
-    )
+    known_threshold = _choose_threshold(y_policy, policy_prob, max_false_positive_rate)
     # Anomaly threshold from benign training references (not test labels).
     # Mean of two independently normalized novelty signals; conservative.
     anomaly_threshold = 0.99
@@ -145,12 +156,11 @@ def train_from_splits(
     metrics["known_threshold"] = known_threshold
     metrics["anomaly_threshold"] = anomaly_threshold
     metrics["max_policy_validation_fpr"] = max_false_positive_rate
-    metrics["policy_validation"] = _safe_metrics(
-        y_policy, policy_prob, known_threshold
-    )
+    metrics["policy_validation"] = _safe_metrics(y_policy, policy_prob, known_threshold)
     metrics["anomaly_alerts_test"] = int(
-        ((test_features[:, 7] >= anomaly_threshold) &
-         (test_prob < known_threshold)).sum()
+        (
+            (test_features[:, 7] >= anomaly_threshold) & (test_prob < known_threshold)
+        ).sum()
     )
 
     # Attack-family classification is a separate, abstaining classifier.
@@ -167,9 +177,14 @@ def train_from_splits(
         from nohack.models.hybrid import encode_flow
 
         family_model = CatBoostClassifier(
-            iterations=150, depth=5, learning_rate=0.07,
-            loss_function="MultiClass", verbose=False,
-            thread_count=2, random_seed=seed, allow_writing_files=False,
+            iterations=150,
+            depth=5,
+            learning_rate=0.07,
+            loss_function="MultiClass",
+            verbose=False,
+            thread_count=2,
+            random_seed=seed,
+            allow_writing_files=False,
         )
         family_model.fit(
             encode_flow(_frame(train.iloc[np.where(y == 1)[0]])),
@@ -179,24 +194,34 @@ def train_from_splits(
         test_family = test[test_family_source].astype(str).to_numpy()
         eligible = (y_test == 1) & np.isin(test_family, family_names)
         if eligible.any():
-            pred = family_model.predict(
-                encode_flow(_frame(test.iloc[np.where(eligible)[0]]))
-            ).reshape(-1).astype(str)
+            pred = (
+                family_model.predict(
+                    encode_flow(_frame(test.iloc[np.where(eligible)[0]]))
+                )
+                .reshape(-1)
+                .astype(str)
+            )
             family_report = {
-                "status": "trained", "family_classes": family_names,
+                "status": "trained",
+                "family_classes": family_names,
                 "evaluated_test_attack_rows": int(eligible.sum()),
                 "macro_f1_on_known_families": float(
                     f1_score(test_family[eligible], pred, average="macro")
                 ),
             }
         else:
-            family_report = {"status": "trained", "family_classes": family_names,
-                             "evaluated_test_attack_rows": 0}
+            family_report = {
+                "status": "trained",
+                "family_classes": family_names,
+                "evaluated_test_attack_rows": 0,
+            }
     metrics["attack_family"] = family_report
 
     output_dir.mkdir(parents=True, exist_ok=True)
     bundle = {
-        "base": base, "meta": meta, "calibrator": calibrator,
+        "base": base,
+        "meta": meta,
+        "calibrator": calibrator,
         "family_model": family_model,
         "known_threshold": known_threshold,
         "anomaly_threshold": anomaly_threshold,
@@ -207,14 +232,17 @@ def train_from_splits(
     bundle_path = output_dir / "hybrid.joblib"
     joblib.dump(bundle, bundle_path, compress=3)
     manifest = {
-        "product": "No Hack", "bundle_format": 1,
+        "product": "No Hack",
+        "bundle_format": 1,
         "model_type": "hybrid_oof_binary_with_anomaly",
         "feature_schema_version": FEATURE_SCHEMA_VERSION,
         "feature_schema_sha256": schema_fingerprint(),
         "bundle_filename": "hybrid.joblib",
         "bundle_sha256": _digest(bundle_path),
         "training_data_manifest_sha256": _digest(data_dir / "manifest.json"),
-        "seed": seed, "n_folds": folds, "metrics": metrics,
+        "seed": seed,
+        "n_folds": folds,
+        "metrics": metrics,
         "attack_family_model": family_report["status"],
         "model_status": "trained_not_windows_validated",
         "artifact_warning": (

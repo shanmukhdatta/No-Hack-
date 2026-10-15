@@ -3,6 +3,7 @@
 Each output flow requires an independently verified exact flow_id label.
 This tool NEVER labels a whole PCAP malicious based on a filename.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -36,15 +37,21 @@ def export_verified_flows(pcap: Path, annotations: Path, output: Path) -> int:
     count = 0
     try:
         with temporary.open("x", newline="", encoding="utf-8") as stream:
-            writer = csv.DictWriter(stream, fieldnames=[*FEATURE_NAMES, "label", "group_id"])
+            writer = csv.DictWriter(
+                stream, fieldnames=[*FEATURE_NAMES, "label", "group_id"]
+            )
             writer.writeheader()
             for record in replay_pcap(pcap, FlowProcessor()):
                 identity = record.flow.context.flow_id
                 if identity not in expected or identity in seen:
-                    raise ValueError("Flow label missing or repeated; label matching failed")
+                    raise ValueError(
+                        "Flow label missing or repeated; label matching failed"
+                    )
                 seen.add(identity)
                 label, group = expected[identity]
-                writer.writerow({**record.flow.features, "label": label, "group_id": group})
+                writer.writerow(
+                    {**record.flow.features, "label": label, "group_id": group}
+                )
                 count += 1
         if set(expected) != seen:
             raise ValueError("Annotations contain flows not found in the PCAP")
@@ -61,7 +68,9 @@ def main() -> int:
     parser.add_argument("--annotations", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    print(f"Exported {export_verified_flows(args.pcap,args.annotations,args.output)} canonical labeled flows")
+    print(
+        f"Exported {export_verified_flows(args.pcap, args.annotations, args.output)} canonical labeled flows"
+    )
     return 0
 
 

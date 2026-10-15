@@ -1,4 +1,5 @@
 """Train No Hack hybrid stack on verified canonical Parquet splits."""
+
 from __future__ import annotations
 
 import argparse
@@ -17,8 +18,11 @@ def main() -> int:
     parser.add_argument("--max-fpr", type=float, default=0.02)
     args = parser.parse_args()
     result = train_from_splits(
-        args.data, args.output, seed=args.seed,
-        folds=args.folds, max_false_positive_rate=args.max_fpr,
+        args.data,
+        args.output,
+        seed=args.seed,
+        folds=args.folds,
+        max_false_positive_rate=args.max_fpr,
     )
     print(json.dumps(result["metrics"], indent=2))
     return 0

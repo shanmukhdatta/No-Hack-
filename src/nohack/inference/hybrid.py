@@ -1,4 +1,5 @@
 """Versioned, fail-closed hybrid inference; trusted local model bundles only."""
+
 from __future__ import annotations
 
 import json
@@ -18,22 +19,25 @@ def load_bundle(folder: Path, *, trust_local_artifact: bool = False) -> dict[str
         )
     manifest = json.loads((folder / "manifest.json").read_text(encoding="utf-8"))
     model_path = folder / "hybrid.joblib"
-    if (manifest.get("bundle_format") != 1
-            or manifest.get("bundle_filename") != "hybrid.joblib"
-            or manifest.get("feature_schema_sha256") != schema_fingerprint()
-            or _digest(model_path) != manifest.get("bundle_sha256")):
+    if (
+        manifest.get("bundle_format") != 1
+        or manifest.get("bundle_filename") != "hybrid.joblib"
+        or manifest.get("feature_schema_sha256") != schema_fingerprint()
+        or _digest(model_path) != manifest.get("bundle_sha256")
+    ):
         raise ValueError("Model manifest/hash/schema verification failed")
     import joblib
 
     bundle: dict[str, Any] = joblib.load(model_path)
-    if (tuple(bundle["feature_names"]) != FEATURE_NAMES
-            or bundle["feature_schema_sha256"] != schema_fingerprint()):
+    if (
+        tuple(bundle["feature_names"]) != FEATURE_NAMES
+        or bundle["feature_schema_sha256"] != schema_fingerprint()
+    ):
         raise ValueError("Loaded model feature contract mismatch")
     return bundle
 
 
-def predict_features(bundle: dict[str, Any], values: dict[str, Any]
-                     ) -> dict[str, Any]:
+def predict_features(bundle: dict[str, Any], values: dict[str, Any]) -> dict[str, Any]:
     """Produce a flow assessment, not an assertion of website safety."""
     import numpy as np
     import pandas as pd

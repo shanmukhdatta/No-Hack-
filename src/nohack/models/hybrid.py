@@ -1,4 +1,5 @@
 """Reusable hybrid network-flow stacking components (no private packet data)."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -15,15 +16,22 @@ from nohack.features import FEATURE_NAMES
 NUMERICAL = [name for name in FEATURE_NAMES if name != "protocol"]
 PROTOCOL_ORDER = ("TCP", "UDP", "ICMP", "ICMPV6")
 META_COLUMNS = (
-    "xgb_attack", "lightgbm_attack", "catboost_attack",
-    "iforest_percentile", "gmm_percentile", "supervised_mean",
-    "supervised_std", "anomaly_mean", "evidence_gap", "supervised_votes",
+    "xgb_attack",
+    "lightgbm_attack",
+    "catboost_attack",
+    "iforest_percentile",
+    "gmm_percentile",
+    "supervised_mean",
+    "supervised_std",
+    "anomaly_mean",
+    "evidence_gap",
+    "supervised_votes",
 )
 
 
 def encode_flow(frame: pd.DataFrame) -> np.ndarray:
     """Stable numerical encoding for all supported model families."""
-    if tuple(frame.columns[:len(FEATURE_NAMES)]) != FEATURE_NAMES:
+    if tuple(frame.columns[: len(FEATURE_NAMES)]) != FEATURE_NAMES:
         raise ValueError("NoHackFlow order mismatch")
     if not frame["protocol"].isin(PROTOCOL_ORDER).all():
         raise ValueError("Unsupported protocol")
@@ -35,8 +43,9 @@ def encode_flow(frame: pd.DataFrame) -> np.ndarray:
     return np.column_stack([numeric, categories.astype(np.float64)])
 
 
-def anomaly_matrix(encoded: np.ndarray, scaler: RobustScaler | None = None
-                   ) -> tuple[np.ndarray, RobustScaler]:
+def anomaly_matrix(
+    encoded: np.ndarray, scaler: RobustScaler | None = None
+) -> tuple[np.ndarray, RobustScaler]:
     """Log1p-scale numerical flow magnitudes; train-fitted RobustScaler only."""
     n = len(NUMERICAL)
     values = np.concatenate((np.log1p(encoded[:, :n]), encoded[:, n:]), axis=1)
@@ -60,15 +69,21 @@ class HybridBase:
     def meta_features(self, frame: pd.DataFrame) -> np.ndarray:
         x = encode_flow(frame)
         numeric, _ = anomaly_matrix(x, self.anomaly_scaler)
-        supervised = np.column_stack([
-            self.supervised[name].predict_proba(x)[:, 1]
-            for name in ("xgb", "lightgbm", "catboost")
-        ])
+        supervised = np.column_stack(
+            [
+                self.supervised[name].predict_proba(x)[:, 1]
+                for name in ("xgb", "lightgbm", "catboost")
+            ]
+        )
         # Greater values mean more anomalous, unlike sklearn score_samples().
         iso = -self.isolation_forest.score_samples(numeric)
         gmm = -self.gaussian_mixture.score_samples(numeric)
-        a = np.searchsorted(self.iso_reference, iso, side="right") / len(self.iso_reference)
-        b = np.searchsorted(self.gmm_reference, gmm, side="right") / len(self.gmm_reference)
+        a = np.searchsorted(self.iso_reference, iso, side="right") / len(
+            self.iso_reference
+        )
+        b = np.searchsorted(self.gmm_reference, gmm, side="right") / len(
+            self.gmm_reference
+        )
         anomaly = (a + b) / 2
         mean = supervised.mean(axis=1)
         std = supervised.std(axis=1)
@@ -77,8 +92,9 @@ class HybridBase:
         return np.column_stack([supervised, a, b, mean, std, anomaly, gap, votes])
 
 
-def train_hybrid_base(frame: pd.DataFrame, labels: np.ndarray, *, seed: int
-                      ) -> HybridBase:
+def train_hybrid_base(
+    frame: pd.DataFrame, labels: np.ndarray, *, seed: int
+) -> HybridBase:
     """Fit three supervised classifiers and benign-reference anomaly models."""
     from catboost import CatBoostClassifier
     from lightgbm import LGBMClassifier
@@ -89,19 +105,34 @@ def train_hybrid_base(frame: pd.DataFrame, labels: np.ndarray, *, seed: int
         raise ValueError("A training fold must contain benign and attack classes")
     models: dict[str, Any] = {
         "xgb": XGBClassifier(
-            n_estimators=100, max_depth=5, learning_rate=0.07,
-            subsample=0.85, colsample_bytree=0.9, n_jobs=2,
-            tree_method="hist", random_state=seed, eval_metric="logloss",
+            n_estimators=100,
+            max_depth=5,
+            learning_rate=0.07,
+            subsample=0.85,
+            colsample_bytree=0.9,
+            n_jobs=2,
+            tree_method="hist",
+            random_state=seed,
+            eval_metric="logloss",
         ),
         "lightgbm": LGBMClassifier(
-            n_estimators=120, num_leaves=24, learning_rate=0.06,
-            class_weight="balanced", verbosity=-1, n_jobs=2,
+            n_estimators=120,
+            num_leaves=24,
+            learning_rate=0.06,
+            class_weight="balanced",
+            verbosity=-1,
+            n_jobs=2,
             random_state=seed,
         ),
         "catboost": CatBoostClassifier(
-            iterations=120, depth=5, learning_rate=0.07,
-            verbose=False, thread_count=2, random_seed=seed,
-            auto_class_weights="Balanced", allow_writing_files=False,
+            iterations=120,
+            depth=5,
+            learning_rate=0.07,
+            verbose=False,
+            thread_count=2,
+            random_seed=seed,
+            auto_class_weights="Balanced",
+            allow_writing_files=False,
         ),
     }
     for model in models.values():
@@ -111,12 +142,22 @@ def train_hybrid_base(frame: pd.DataFrame, labels: np.ndarray, *, seed: int
         raise ValueError("At least 20 benign flows required per training fold")
     # Robust preprocessing is fitted ONLY to benign examples within the fold.
     scaled, scaler = anomaly_matrix(benign)
-    iforest = IsolationForest(n_estimators=120, max_samples=min(512, len(benign)),
-                               contamination="auto", n_jobs=2, random_state=seed)
+    iforest = IsolationForest(
+        n_estimators=120,
+        max_samples=min(512, len(benign)),
+        contamination="auto",
+        n_jobs=2,
+        random_state=seed,
+    )
     iforest.fit(scaled)
     components = min(3, max(1, len(benign) // 30))
-    gmm = GaussianMixture(n_components=components, covariance_type="diag",
-                          reg_covar=1e-3, max_iter=120, random_state=seed)
+    gmm = GaussianMixture(
+        n_components=components,
+        covariance_type="diag",
+        reg_covar=1e-3,
+        max_iter=120,
+        random_state=seed,
+    )
     gmm.fit(scaled)
     iso_reference = np.sort(-iforest.score_samples(scaled))
     gmm_reference = np.sort(-gmm.score_samples(scaled))

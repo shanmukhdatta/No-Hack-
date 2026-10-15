@@ -1,4 +1,5 @@
 """Privacy-minimized SQLite storage for ML assessments of local flows."""
+
 from __future__ import annotations
 
 import json
@@ -41,8 +42,12 @@ class PredictionStore:
         self.connection.execute(SCHEMA)
         return self
 
-    def __exit__(self, typ: type[BaseException] | None, exc: BaseException | None,
-                 tb: TracebackType | None) -> None:
+    def __exit__(
+        self,
+        typ: type[BaseException] | None,
+        exc: BaseException | None,
+        tb: TracebackType | None,
+    ) -> None:
         assert self.connection is not None
         if typ is None:
             self.connection.commit()
@@ -61,11 +66,14 @@ class PredictionStore:
             LEFT JOIN flow_predictions AS p ON p.observation_id = o.id
             WHERE p.observation_id IS NULL
             ORDER BY o.id ASC LIMIT ?
-            """, (limit,)
+            """,
+            (limit,),
         ).fetchall()
         return [(int(i), json.loads(raw)) for i, raw in rows]
 
-    def add(self, observation_id: int, result: dict[str, Any], model_sha256: str) -> None:
+    def add(
+        self, observation_id: int, result: dict[str, Any], model_sha256: str
+    ) -> None:
         if result["state"] not in ALLOWED_STATES:
             raise ValueError("Invalid assessment state")
         if not (0 <= result["risk_score"] <= 100):
@@ -78,14 +86,20 @@ class PredictionStore:
                 anomaly_percentile, model_disagreement, attack_family, attack_family_confidence,
                 top_reasons, feature_schema_version, model_sha256
             ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                observation_id, result["state"], result["risk_score"],
-                result["known_threat_probability"], result["anomaly_percentile"],
-                result["model_disagreement"], result.get("attack_family"),
+            """,
+            (
+                observation_id,
+                result["state"],
+                result["risk_score"],
+                result["known_threat_probability"],
+                result["anomaly_percentile"],
+                result["model_disagreement"],
+                result.get("attack_family"),
                 result.get("attack_family_confidence"),
                 json.dumps(result["top_reasons"]),
-                result["feature_schema_version"], model_sha256,
-            )
+                result["feature_schema_version"],
+                model_sha256,
+            ),
         )
 
 
@@ -102,13 +116,18 @@ def recent_assessments(database: Path, limit: int = 10) -> list[dict[str, Any]]:
                 FROM flow_predictions p
                 JOIN flow_observations o ON o.id = p.observation_id
                 ORDER BY p.observation_id DESC LIMIT ?
-                """, (limit,)
+                """,
+                (limit,),
             ).fetchall()
     except sqlite3.Error:
         return []
     return [
-        {"state": state, "risk_score": risk,
-         "observed_at": timestamp, "reasons": json.loads(reasons),
-         "attack_family": family}
+        {
+            "state": state,
+            "risk_score": risk,
+            "observed_at": timestamp,
+            "reasons": json.loads(reasons),
+            "attack_family": family,
+        }
         for state, risk, timestamp, reasons, family in rows
     ]
