@@ -1,4 +1,5 @@
 """Create a reproducible unpacked-extension ZIP; not a Web Store release."""
+
 from __future__ import annotations
 
 import argparse
@@ -35,7 +36,9 @@ def package(source: Path, output: Path) -> Path:
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--source", type=Path, default=Path("extension"))
-    p.add_argument("--output", type=Path, default=Path("dist/nohack-extension-source.zip"))
+    p.add_argument(
+        "--output", type=Path, default=Path("dist/nohack-extension-source.zip")
+    )
     args = p.parse_args()
     print(package(args.source, args.output))
 
