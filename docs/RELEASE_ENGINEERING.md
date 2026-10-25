@@ -1,6 +1,6 @@
 # No Hack — Release Engineering Tracker
 
-As of 2026-10-25. Statuses are about CODE existence, never claims of live detection. Integration code merged into main via PRs #7, #8, and #9. External release gates remain incomplete.
+As of 2026-10-25. Statuses are about CODE existence, never claims of live detection. Integration code merged into main via PRs #7, #8, #9, and #10. External release gates remain incomplete.
 
 Legend: DONE = authored source/docs; CODED = implementation exists awaiting integration acceptance; PARTIAL = restricted scope; PENDING = not delivered.
 
@@ -39,9 +39,12 @@ Legend: DONE = authored source/docs; CODED = implementation exists awaiting inte
 - PR #7 merged at 3a7981d641dff172c0394662ad0440db1b82b2fc.
 - PR #8 merged at e7854b63a9b5ece63570f2f0562f1a26ab74c398.
 - PR #9 merged at d453856671008a936323bc7be8dff3a974a57305.
+- PR #10 merged at 5217e8dfb21a62c88e2429228a89aea5124f7531: artificial example-data generator, real hybrid software fit/export/load/inference, demo provenance carried through local API/native host/Chrome.
 - PR #9 source CI: https://github.com/shanmukhdatta/No-Hack-/actions/runs/40193271407 (Linux, Windows, Node and ML checks passed).
 - PR #9 packaging preview: https://github.com/shanmukhdatta/No-Hack-/actions/runs/40193271417 (extension ZIP and unsigned native host preview built).
 - No validated production model, Chrome Web Store listing or signed installer is claimed.
+
+- PR #10 CI: https://github.com/shanmukhdatta/No-Hack-/actions/runs/40200870277 — Linux/Windows, Chrome, ML, and executable synthetic demo passed. No real-data metrics were produced.
 
 ## Resume in Antigravity
 
