@@ -1,4 +1,6 @@
 """Known-distribution drift tests; not an intrusion-detection accuracy test."""
+
+# ruff: noqa: E402
 from __future__ import annotations
 
 import pytest
