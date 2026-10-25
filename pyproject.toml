@@ -77,6 +77,7 @@ branch = true
 source = ["nohack"]
 
 [tool.ruff]
+extend-exclude = ["notebooks/*.ipynb"]
 line-length = 88
 target-version = "py311"
 
