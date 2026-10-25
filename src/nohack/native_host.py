@@ -8,16 +8,46 @@ or fabricate ML threat results.
 from __future__ import annotations
 
 import json
+import re
 import struct
 import sys
 from pathlib import Path
 from typing import BinaryIO
+from urllib.error import URLError
+from urllib.request import urlopen
 
 from nohack.capture.capabilities import capture_capabilities
 from nohack.storage.predictions import recent_assessments
 
 MAX_REQUEST_BYTES = 65_536
 MAX_RESPONSE_BYTES = 1_048_576
+
+
+
+def local_model_status() -> dict[str, object]:
+    """Probe only our fixed loopback API. An unavailable server is not a model."""
+    try:
+        with urlopen("http://127.0.0.1:8787/model/status", timeout=0.35) as response:
+            if getattr(response, "status", 200) != 200:
+                return {"model_loaded": False}
+            payload = response.read(4096)
+        value = json.loads(payload.decode("utf-8"))
+    except (OSError, URLError, ValueError, UnicodeDecodeError, TimeoutError):
+        return {"model_loaded": False}
+    if not isinstance(value, dict):
+        return {"model_loaded": False}
+    digest = value.get("model_sha256")
+    verified = (
+        value.get("service") == "nohack-local-api"
+        and value.get("scope") == "network_flow_only"
+        and value.get("model_connected") is True
+        and isinstance(digest, str)
+        and re.fullmatch(r"[0-9a-fA-F]{64}", digest) is not None
+    )
+    return {
+        "model_loaded": bool(verified),
+        "model_sha256": digest if verified else None,
+    }
 
 
 def read_message(stream: BinaryIO) -> object | None:
@@ -64,13 +94,15 @@ def handle_message(value: object) -> dict[str, object]:
             "assessments": recent_assessments(database, limit=10),
         }
     if request_type == "status":
+        state = local_model_status()
         return {
             "ok": True,
             "protocol_version": 1,
             "capture": capture_capabilities(),
             "monitoring_active": False,
-            "model_loaded": False,
-            "note": "Read-only companion handshake; does not start capture or ML",
+            "model_loaded": state["model_loaded"],
+            "model_sha256": state["model_sha256"],
+            "note": "Read-only companion; model status checked on fixed local API only",
         }
     return {"ok": False, "error": "Unsupported read-only command"}
 
