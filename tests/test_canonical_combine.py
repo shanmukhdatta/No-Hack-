@@ -12,6 +12,7 @@ import pytest
 pd = pytest.importorskip("pandas")
 from nohack.features.flow_schema import FEATURE_SPECS
 
+
 def row(label: str, group: str) -> dict[str, object]:
     data = {name: 0 if kind == "int" else 0.0 for name, kind in FEATURE_SPECS if kind != "category"}
     data.update({"protocol": "TCP", "label": label, "group_id": group})
