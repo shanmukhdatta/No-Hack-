@@ -1,4 +1,5 @@
 """Extension packaging should contain only audited source files."""
+
 from __future__ import annotations
 
 import importlib.util
