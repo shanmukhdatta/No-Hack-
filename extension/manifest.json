@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "No Hack — Browser Signals",
+  "short_name": "No Hack",
+  "version": "0.1.0",
+  "description": "Local, opt-in browser navigation signals with an optional Windows companion.",
+  "permissions": ["storage", "tabs", "webNavigation", "nativeMessaging"],
+  "background": {"service_worker": "background.js", "type": "module"},
+  "action": {"default_title": "No Hack", "default_popup": "popup.html"},
+  "options_page": "dashboard.html",
+  "minimum_chrome_version": "114"
+}
