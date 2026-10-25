@@ -2,6 +2,7 @@
 
 Do not describe component explanations as causal or as the full ensemble's SHAP.
 """
+
 from __future__ import annotations
 
 from typing import Any
@@ -42,7 +43,6 @@ def explain_xgb_component(
         "not_causal": True,
         "not_full_stack_explanation": True,
         "contributions": [
-            {"feature": names[int(i)], "shap_value": float(scores[i])}
-            for i in ranks
+            {"feature": names[int(i)], "shap_value": float(scores[i])} for i in ranks
         ],
     }
