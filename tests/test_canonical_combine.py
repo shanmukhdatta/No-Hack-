@@ -1,5 +1,7 @@
 """Validated multi-dataset joining never fabricates features or labels."""
 
+# ruff: noqa: E402
+
 from __future__ import annotations
 
 import json
