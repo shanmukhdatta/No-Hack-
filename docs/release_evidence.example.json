@@ -1,0 +1,30 @@
+{
+  "real_label_provenance": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "independent_heldout_evaluation": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "false_positive_review": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "local_capture_parity": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "windows_chrome_integration": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "package_security_review": {
+    "accepted": false,
+    "evidence": ""
+  },
+  "published_site_checked": {
+    "accepted": false,
+    "evidence": ""
+  }
+}
