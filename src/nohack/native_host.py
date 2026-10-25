@@ -23,7 +23,6 @@ MAX_REQUEST_BYTES = 65_536
 MAX_RESPONSE_BYTES = 1_048_576
 
 
-
 def local_model_status() -> dict[str, object]:
     """Probe only our fixed loopback API. An unavailable server is not a model."""
     try:
