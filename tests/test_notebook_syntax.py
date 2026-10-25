@@ -1,4 +1,5 @@
 """Static structural checks for educational notebooks without private data."""
+
 from __future__ import annotations
 
 import json
@@ -16,5 +17,7 @@ def test_five_learning_notebooks_compile() -> None:
         for index, cell in enumerate(notebook["cells"]):
             assert cell["cell_type"] in {"markdown", "code"}
             if cell["cell_type"] == "code":
-                compile("".join(cell["source"]), f"{candidates[0].name}:cell{index}", "exec")
+                compile(
+                    "".join(cell["source"]), f"{candidates[0].name}:cell{index}", "exec"
+                )
                 assert cell["outputs"] == []
