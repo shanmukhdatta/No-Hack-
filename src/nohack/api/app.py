@@ -35,6 +35,7 @@ def create_app(
     model: dict[str, Any] | None = None
     model_sha: str | None = None
     load_error: str | None = None
+    loaded_manifest: dict[str, Any] | None = None
 
     if model_dir is not None:
         if not trust_local_model:
@@ -44,8 +45,10 @@ def create_app(
                 from nohack.inference.hybrid import load_bundle
 
                 model = load_bundle(model_dir, trust_local_artifact=True)
-                manifest = json.loads((model_dir / "manifest.json").read_text("utf-8"))
-                model_sha = str(manifest["bundle_sha256"])
+                loaded_manifest = json.loads(
+                    (model_dir / "manifest.json").read_text("utf-8")
+                )
+                model_sha = str(loaded_manifest["bundle_sha256"])
             except (OSError, ValueError, KeyError, ImportError) as exc:
                 load_error = type(exc).__name__
 
@@ -65,6 +68,15 @@ def create_app(
             "model_connected": model is not None,
             "model_sha256": model_sha,
             "status": "ready" if model is not None else "model_not_connected",
+            "synthetic_demo_only": bool(
+                loaded_manifest is not None
+                and loaded_manifest.get("synthetic_demo_only") is True
+            ),
+            "model_validation_status": (
+                str(loaded_manifest.get("model_status", "unverified"))
+                if loaded_manifest is not None
+                else "not_loaded"
+            ),
             "reason": load_error,
         }
 
