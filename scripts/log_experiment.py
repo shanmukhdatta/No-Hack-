@@ -2,6 +2,7 @@
 
 This does not run model training and never invents evaluation metrics.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -34,15 +35,31 @@ def main() -> None:
         mlflow.set_tag("data_provenance", "user_supplied_canonical_only")
         mlflow.set_tag("validation_status", "not_windows_validated")
         mlflow.set_tag("model_sha256", manifest["bundle_sha256"])
-        mlflow.log_params({"folds": manifest["n_folds"], "seed": manifest["seed"],
-                           "feature_schema": manifest["feature_schema_version"]})
-        for key in ("f1", "precision", "recall", "average_precision",
-                    "roc_auc", "brier", "false_positive_rate"):
+        mlflow.log_params(
+            {
+                "folds": manifest["n_folds"],
+                "seed": manifest["seed"],
+                "feature_schema": manifest["feature_schema_version"],
+            }
+        )
+        for key in (
+            "f1",
+            "precision",
+            "recall",
+            "average_precision",
+            "roc_auc",
+            "brier",
+            "false_positive_rate",
+        ):
             if metrics.get(key) is not None:
                 mlflow.log_metric("heldout_" + key, float(metrics[key]))
         mlflow.log_artifact(str(metrics_path), artifact_path="reports")
         mlflow.log_artifact(str(manifest_path), artifact_path="manifests")
-        print(json.dumps({"run_id": run.info.run_id, "model_sha256": manifest["bundle_sha256"]}))
+        print(
+            json.dumps(
+                {"run_id": run.info.run_id, "model_sha256": manifest["bundle_sha256"]}
+            )
+        )
 
 
 if __name__ == "__main__":
