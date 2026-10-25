@@ -3,6 +3,7 @@
 The Chrome MV3 extension does NOT call this API. It uses restricted Native Messaging.
 Run only on loopback, and never publish this app on a public address.
 """
+
 from __future__ import annotations
 
 import json
@@ -50,7 +51,11 @@ def create_app(
 
     @app.get("/health")
     def health() -> dict[str, object]:
-        return {"service": "nohack-local-api", "ready": True, "model_connected": model is not None}
+        return {
+            "service": "nohack-local-api",
+            "ready": True,
+            "model_connected": model is not None,
+        }
 
     @app.get("/model/status")
     def model_status() -> dict[str, object]:
@@ -66,7 +71,10 @@ def create_app(
     def assessments(limit: int = 10) -> dict[str, object]:
         if not 1 <= limit <= 20:
             raise HTTPException(status_code=422, detail="limit must be 1..20")
-        return {"scope": "network_flows_not_browser_tabs", "items": recent_assessments(database, limit)}
+        return {
+            "scope": "network_flows_not_browser_tabs",
+            "items": recent_assessments(database, limit),
+        }
 
     @app.post("/predict")
     def predict(request: dict[str, Any]) -> dict[str, object]:
@@ -81,7 +89,9 @@ def create_app(
         try:
             return predict_features(model, features)
         except (ValueError, TypeError, KeyError):
-            raise HTTPException(status_code=422, detail="Invalid NoHackFlow values") from None
+            raise HTTPException(
+                status_code=422, detail="Invalid NoHackFlow values"
+            ) from None
 
     @app.middleware("http")
     async def protect_predict(request: Any, call_next: Any) -> Any:
@@ -93,7 +103,9 @@ def create_app(
             secret = os.environ.get("NOHACK_API_TOKEN", "")
             received = request.headers.get("x-nohack-token", "")
             if len(secret) < 24 or not hmac.compare_digest(received, secret):
-                return JSONResponse({"detail": "Local test token required"}, status_code=401)
+                return JSONResponse(
+                    {"detail": "Local test token required"}, status_code=401
+                )
         return await call_next(request)
 
     return app
