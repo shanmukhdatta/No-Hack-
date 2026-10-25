@@ -1,4 +1,5 @@
 """Group-aware evaluation of independent held-out network-flow labels."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -30,7 +31,7 @@ def evaluate_binary(
     if not (0 <= p).all() or not (p <= 1).all() or not 0 < threshold <= 1:
         raise ValueError("Probability or threshold outside valid bounds")
     decision = (p >= threshold).astype(int)
-    neg = (y == 0)
+    neg = y == 0
     return {
         "rows": int(len(y)),
         "n_attack": int((y == 1).sum()),
