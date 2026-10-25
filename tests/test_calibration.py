@@ -1,4 +1,5 @@
 """Post-hoc calibration diagnostics need independently verified labels."""
+
 from __future__ import annotations
 
 import pytest

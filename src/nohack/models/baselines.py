@@ -1,4 +1,5 @@
 """Simple binary baselines for comparison with No Hack's hybrid stack."""
+
 from __future__ import annotations
 
 from typing import Any
@@ -35,7 +36,9 @@ def run_baselines(
     candidates = {
         "logistic_regression": make_pipeline(
             StandardScaler(),
-            LogisticRegression(max_iter=1000, class_weight="balanced", random_state=seed),
+            LogisticRegression(
+                max_iter=1000, class_weight="balanced", random_state=seed
+            ),
         ),
         "random_forest": RandomForestClassifier(
             n_estimators=150, class_weight="balanced", random_state=seed, n_jobs=2

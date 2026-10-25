@@ -1,9 +1,10 @@
 """Check code presence and external acceptance without inventing tests."""
+
 from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import asdict, dataclass
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -19,9 +20,14 @@ COMPONENTS = (
     Component("Canonical flow features", ("src/nohack/features/flow_schema.py",)),
     Component("Authorized capture", ("src/nohack/capture/session.py",), True),
     Component("PCAP replay", ("src/nohack/capture/replay.py",), True),
-    Component("Private annotation workflow", ("scripts/review_pcap_annotations.py",), True),
+    Component(
+        "Private annotation workflow", ("scripts/review_pcap_annotations.py",), True
+    ),
     Component("Dataset audit/splitting", ("src/nohack/datasets/prepare.py",), True),
-    Component("Beginner-to-advanced notebooks", ("notebooks/01_dataset_audit.ipynb", "notebooks/05_hybrid_stack_export.ipynb")),
+    Component(
+        "Beginner-to-advanced notebooks",
+        ("notebooks/01_dataset_audit.ipynb", "notebooks/05_hybrid_stack_export.ipynb"),
+    ),
     Component("Baseline experiments", ("src/nohack/models/baselines.py",)),
     Component("Stacked hybrid training", ("src/nohack/training/hybrid.py",), True),
     Component("Trusted model inference", ("src/nohack/inference/hybrid.py",), True),
@@ -94,7 +100,9 @@ def self_attested_acceptance(evidence_file: Path) -> dict[str, Any]:
         record = data[key]
         if not isinstance(record, dict) or set(record) != {"accepted", "evidence"}:
             raise ValueError(f"Invalid external acceptance record: {key}")
-        if type(record["accepted"]) is not bool or not isinstance(record["evidence"], str):
+        if type(record["accepted"]) is not bool or not isinstance(
+            record["evidence"], str
+        ):
             raise ValueError(f"Invalid external acceptance value: {key}")
         if record["accepted"] and not record["evidence"].strip():
             raise ValueError(f"Accepted gate lacks evidence reference: {key}")

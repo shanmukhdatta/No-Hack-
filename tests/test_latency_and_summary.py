@@ -1,4 +1,5 @@
 """Pure deterministic contract checks; timing numbers are not precomputed."""
+
 from __future__ import annotations
 
 import pytest
@@ -15,10 +16,12 @@ def test_real_timing_shape() -> None:
 
 
 def test_unlabeled_assessments_are_not_accuracy() -> None:
-    result = summarize_assessments([
-        {"state": "NORMAL", "risk_score": 15},
-        {"state": "UNCERTAIN", "risk_score": 70},
-    ])
+    result = summarize_assessments(
+        [
+            {"state": "NORMAL", "risk_score": 15},
+            {"state": "UNCERTAIN", "risk_score": 70},
+        ]
+    )
     assert result["rows"] == 2
     assert result["detection_accuracy_not_measured"] is True
     with pytest.raises(ValueError):

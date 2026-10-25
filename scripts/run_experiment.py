@@ -3,6 +3,7 @@
 Use only externally verified canonical labels. No attack labels are invented,
 and no synthetic fixture is reported as a real detector. Never overwrite a run.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -14,7 +15,9 @@ from nohack.models.baselines import run_baselines
 from nohack.training.hybrid import train_from_splits
 
 
-def run_experiment(source: Path, output: Path, *, seed: int = 42, folds: int = 4) -> dict[str, object]:
+def run_experiment(
+    source: Path, output: Path, *, seed: int = 42, folds: int = 4
+) -> dict[str, object]:
     """Prepare, train baselines + hybrid and record immutable run information."""
     if output.exists() and any(output.iterdir()):
         raise ValueError("Run directory is not empty; choose a new output path")

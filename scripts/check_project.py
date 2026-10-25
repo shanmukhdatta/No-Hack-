@@ -1,4 +1,5 @@
 """Offline all-component code inventory and optional self-attested acceptance."""
+
 from __future__ import annotations
 
 import argparse

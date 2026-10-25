@@ -1,4 +1,5 @@
 """Local UI notifications never block network traffic."""
+
 from __future__ import annotations
 
 import pytest

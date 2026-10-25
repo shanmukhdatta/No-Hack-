@@ -1,4 +1,5 @@
 """Post-hoc calibration diagnostics for independent binary heldout labels."""
+
 from __future__ import annotations
 
 import numpy as np
@@ -31,7 +32,12 @@ def calibration_bins(
             confidence = float(p[selected].mean())
             ece += count * abs(observed - confidence) / len(y)
             result.append(
-                {"bin": i, "count": count, "mean_predicted": confidence, "observed_frequency": observed}
+                {
+                    "bin": i,
+                    "count": count,
+                    "mean_predicted": confidence,
+                    "observed_frequency": observed,
+                }
             )
     return {
         "kind": "independent_label_calibration_diagnostic",

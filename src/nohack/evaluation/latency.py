@@ -1,4 +1,5 @@
 """Measured local inference latency; no invented speed claims."""
+
 from __future__ import annotations
 
 import math

@@ -1,4 +1,5 @@
 """Conservative notification gate; never blocks traffic or claims safety."""
+
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -13,6 +14,7 @@ class LocalAlertGate:
     Timestamps are caller monotonic seconds. This is UI notification logic
     only; source IPs, payloads and browser tab IDs must not be used as keys.
     """
+
     cooldown_seconds: float = 30.0
     max_keys: int = 256
     last_seen: dict[str, float] = field(default_factory=dict)

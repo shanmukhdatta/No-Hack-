@@ -1,4 +1,5 @@
 """Compare simple baselines; read only frozen train+validation splits."""
+
 from __future__ import annotations
 
 import argparse
@@ -18,7 +19,10 @@ def main() -> int:
 
     manifest = json.loads((args.splits / "manifest.json").read_text("utf-8"))
     for name in ("train", "val"):
-        if _digest(args.splits / f"{name}.parquet") != manifest["splits"][name]["sha256"]:
+        if (
+            _digest(args.splits / f"{name}.parquet")
+            != manifest["splits"][name]["sha256"]
+        ):
             raise ValueError("Split checksum mismatch")
     train = pd.read_parquet(args.splits / "train.parquet")
     val = pd.read_parquet(args.splits / "val.parquet")

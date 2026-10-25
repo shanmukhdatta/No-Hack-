@@ -4,6 +4,7 @@ template: export REVIEW-ONLY endpoint/timestamp metadata from an authorized PCAP
 approve: accept only manually checked rows with explicit evidence references.
 This cannot independently validate the truth of user-supplied labels.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -13,9 +14,18 @@ from pathlib import Path
 from typing import Any
 
 REVIEW_FIELDS = (
-    "flow_id", "protocol", "src_ip", "dst_ip", "src_port", "dst_port",
-    "started_at_ns", "ended_at_ns", "label", "group_id",
-    "source_evidence", "verification_status",
+    "flow_id",
+    "protocol",
+    "src_ip",
+    "dst_ip",
+    "src_port",
+    "dst_port",
+    "started_at_ns",
+    "ended_at_ns",
+    "label",
+    "group_id",
+    "source_evidence",
+    "verification_status",
 )
 APPROVED_FIELDS = ("flow_id", "label", "group_id")
 
@@ -75,8 +85,12 @@ def approve_review(review: Path, output: Path) -> int:
             evidence = row["source_evidence"].strip()
             status = row["verification_status"].strip().upper()
             if (
-                not flow_id or flow_id in ids or not label
-                or not group or not evidence or status != "VERIFIED"
+                not flow_id
+                or flow_id in ids
+                or not label
+                or not group
+                or not evidence
+                or status != "VERIFIED"
             ):
                 raise ValueError(
                     "Every flow needs a unique ID, verified label, independent "

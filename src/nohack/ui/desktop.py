@@ -1,4 +1,5 @@
 """Minimal optional PySide6 Windows preview, with no implicit packet capture."""
+
 from __future__ import annotations
 
 import json
@@ -27,7 +28,11 @@ def local_json(url: str) -> dict[str, Any]:
 def launch() -> int:
     """Run on demand only. Requires separately installed optional PySide6."""
     from PySide6.QtWidgets import (
-        QApplication, QLabel, QPushButton, QVBoxLayout, QWidget,
+        QApplication,
+        QLabel,
+        QPushButton,
+        QVBoxLayout,
+        QWidget,
     )
 
     app = QApplication.instance() or QApplication([])
@@ -71,8 +76,12 @@ def launch() -> int:
             if isinstance(items, list):
                 for item in items[:10]:
                     if isinstance(item, dict):
-                        lines.append(str(item.get("state", "unknown")) + " · " +
-                                     str(item.get("risk_score", "n/a")) + "/100")
+                        lines.append(
+                            str(item.get("state", "unknown"))
+                            + " · "
+                            + str(item.get("risk_score", "n/a"))
+                            + "/100"
+                        )
             assessment_text.setText(
                 "\n".join(lines) if lines else "No verified local assessments available"
             )

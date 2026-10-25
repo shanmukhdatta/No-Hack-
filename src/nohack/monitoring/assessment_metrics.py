@@ -1,4 +1,5 @@
 """Aggregate bounded local flow assessment states; never accuracy without labels."""
+
 from __future__ import annotations
 
 from collections import Counter

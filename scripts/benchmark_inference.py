@@ -1,4 +1,5 @@
 """Benchmark a trusted locally trained model on provided canonical feature rows."""
+
 from __future__ import annotations
 
 import argparse

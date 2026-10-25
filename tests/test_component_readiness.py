@@ -1,4 +1,5 @@
 """Code inventory cannot certify production readiness."""
+
 from __future__ import annotations
 
 import json
