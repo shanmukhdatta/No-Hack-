@@ -86,6 +86,7 @@ def create_app(
         if not isinstance(features, dict) or set(features) != set(FEATURE_NAMES):
             raise HTTPException(status_code=422, detail="NoHackFlow schema mismatch")
         from nohack.inference.hybrid import predict_features
+
         try:
             return predict_features(model, features)
         except (ValueError, TypeError, KeyError):
