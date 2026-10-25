@@ -36,6 +36,7 @@ data/samples/*
 !data/samples/.gitkeep
 
 # Generated artifacts, runtime state and experiments
+artifacts/demo/
 artifacts/models/*
 !artifacts/models/.gitkeep
 artifacts/reports/*

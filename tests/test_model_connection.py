@@ -45,7 +45,11 @@ def test_verified_local_model_status(monkeypatch: pytest.MonkeyPatch) -> None:
         )
 
     monkeypatch.setattr(host, "urlopen", fake_urlopen)
-    assert local_model_status() == {"model_loaded": True, "model_sha256": "a" * 64}
+    assert local_model_status() == {
+        "model_loaded": True,
+        "model_sha256": "a" * 64,
+        "synthetic_demo_only": False,
+    }
     assert urls == ["http://127.0.0.1:8787/model/status"]
 
 

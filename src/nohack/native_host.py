@@ -46,6 +46,9 @@ def local_model_status() -> dict[str, object]:
     return {
         "model_loaded": bool(verified),
         "model_sha256": digest if verified else None,
+        "synthetic_demo_only": (
+            value.get("synthetic_demo_only") is True if verified else False
+        ),
     }
 
 
@@ -101,6 +104,7 @@ def handle_message(value: object) -> dict[str, object]:
             "monitoring_active": False,
             "model_loaded": state["model_loaded"],
             "model_sha256": state.get("model_sha256"),
+            "synthetic_demo_only": state.get("synthetic_demo_only") is True,
             "note": "Read-only companion; model status checked on fixed local API only",
         }
     return {"ok": False, "error": "Unsupported read-only command"}
