@@ -86,8 +86,9 @@ def create_app(
     @app.middleware("http")
     async def protect_predict(request: Any, call_next: Any) -> Any:
         if request.url.path == "/predict":
-            from fastapi.responses import JSONResponse
             import hmac
+
+            from fastapi.responses import JSONResponse
 
             secret = os.environ.get("NOHACK_API_TOKEN", "")
             received = request.headers.get("x-nohack-token", "")
