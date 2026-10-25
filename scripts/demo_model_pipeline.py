@@ -4,6 +4,7 @@ Generates artificial NoHackFlow records, freezes group-disjoint splits,
 fits the existing hybrid stack, and checks a trusted local model load.
 Never ship the demo bundle as a real cybersecurity detector.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -105,7 +106,12 @@ def run_demo(directory: Path, *, groups: int = 24, folds: int = 3) -> dict[str, 
     manifest_path.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
     bundle = load_bundle(model_dir, trust_local_artifact=True)
     assessment = predict_features(bundle, make_demo_flow(50, 5))
-    assert assessment["state"] in {"NORMAL", "KNOWN_THREAT", "NOVEL_ANOMALY", "UNCERTAIN"}
+    assert assessment["state"] in {
+        "NORMAL",
+        "KNOWN_THREAT",
+        "NOVEL_ANOMALY",
+        "UNCERTAIN",
+    }
     report = {
         "status": "software_smoke_passed_not_detection_accuracy",
         "warning": DEMO_WARNING,
@@ -129,7 +135,11 @@ def main() -> int:
     parser.add_argument("--groups", type=int, default=24)
     parser.add_argument("--folds", type=int, default=3)
     args = parser.parse_args()
-    print(json.dumps(run_demo(args.output_dir, groups=args.groups, folds=args.folds), indent=2))
+    print(
+        json.dumps(
+            run_demo(args.output_dir, groups=args.groups, folds=args.folds), indent=2
+        )
+    )
     return 0
 
 
