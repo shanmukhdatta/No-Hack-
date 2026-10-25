@@ -16,6 +16,7 @@ def main() -> None:
     p.add_argument("--experiment", default="NoHackFlow real-data experiments")
     args = p.parse_args()
     import mlflow
+
     from nohack.datasets.prepare import _digest
 
     manifest_path = args.model_dir / "manifest.json"
