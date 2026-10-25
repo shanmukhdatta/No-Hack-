@@ -62,3 +62,18 @@ GitHub Actions produces a **source preview ZIP** for the Chrome MV3 extension an
 ## 7. Required external acceptance
 
 Record real held-out detection metrics, external dataset performance, post-fix Npcap packet-order behavior, Chrome UI/native host integration, model loading behavior, local API access controls, clean Windows packaging and actual Pages deployment. None of these should be invented or marked complete based solely on CI.
+
+
+## 8. Fast software-demo mode (no dataset required)
+
+To verify the training -> export -> reload -> inference software path BEFORE obtaining real labeled data, run:
+
+    .\.venv\Scripts\python.exe scripts/demo_model_pipeline.py --output-dir artifacts/demo/nohack-smoke
+
+The script creates deterministic artificial NoHackFlow data with **fabricated example labels**, prepares group-disjoint splits, fits and exports the actual hybrid stack, and reloads that bundle for one prediction. This verifies code integration, **not real cybersecurity detection**. Its manifest is marked \`synthetic_demo_only=true\` and \`model_status=synthetic_demo_not_security_validated\`; metrics are not presented as trustworthy performance.
+
+For a local connection demonstration only, start:
+
+    .\.venv\Scripts\python.exe scripts/serve_local_api.py --model artifacts/demo/nohack-smoke/model --trust-local-model
+
+The API and Chrome companion should identify this as a **synthetic demo model**. Never ship, publish or call this demo model a protective or validated detector. Replace it with a genuinely trained, independently evaluated model when one is available.
