@@ -1,4 +1,6 @@
 """Tests exercise pure metrics with no synthetic metrics advertised as results."""
+
+# ruff: noqa: E402
 from __future__ import annotations
 
 import pytest
