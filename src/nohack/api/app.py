@@ -66,7 +66,6 @@ def create_app(
             "model_sha256": model_sha,
             "status": "ready" if model is not None else "model_not_connected",
             "reason": load_error,
-            "scope": "network_flow_only",
         }
 
     @app.get("/assessments")
