@@ -93,3 +93,4 @@ jobs:
           python -m pytest -q -v tests/test_ml_core.py tests/test_prediction_store.py
           tests/test_api_optional.py tests/test_monitoring_drift.py
           tests/test_evaluation_metrics.py tests/test_extension_package.py
+          tests/test_model_connection.py tests/test_canonical_combine.py
