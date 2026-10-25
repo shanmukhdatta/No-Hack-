@@ -6,6 +6,7 @@ import pytest
 pytest.importorskip("fastapi")
 pytest.importorskip("httpx")
 from fastapi.testclient import TestClient
+
 from nohack.api.app import create_app
 
 
