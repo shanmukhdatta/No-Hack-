@@ -16,11 +16,15 @@ from fastapi.testclient import TestClient
 from nohack.api.app import create_app
 
 
-def test_synthetic_model_status(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+def test_synthetic_model_status(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
     import nohack.inference.hybrid as inference
 
     monkeypatch.setattr(
-        inference, "load_bundle", lambda folder, trust_local_artifact: {"test_stub": True}
+        inference,
+        "load_bundle",
+        lambda folder, trust_local_artifact: {"test_stub": True},
     )
     (tmp_path / "manifest.json").write_text(
         json.dumps(
