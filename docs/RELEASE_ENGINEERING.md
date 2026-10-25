@@ -1,6 +1,6 @@
 # No Hack — Release Engineering Tracker
 
-As of 2026-10-25. Statuses are about CODE existence, never claims of live detection. Development branch: feature/release-engineering-2026 based on PR #7.
+As of 2026-10-25. Statuses are about CODE existence, never claims of live detection. Integration code merged into main via PRs #7, #8, and #9. External release gates remain incomplete.
 
 Legend: DONE = authored source/docs; CODED = implementation exists awaiting integration acceptance; PARTIAL = restricted scope; PENDING = not delivered.
 
@@ -32,7 +32,16 @@ Legend: DONE = authored source/docs; CODED = implementation exists awaiting inte
 | T24 | Windows host packaging | CODED | Preview workflow; installer pending |
 | T25 | GitHub Pages site | CODED | Needs Pages setting and deploy check |
 | T26 | Security and external acceptance | PENDING | Physical tests and release gates |
-| T27 | Merge and release | PENDING | Only after CI and acceptance |
+| T27 | Merge and release | PARTIAL | Code merged to main after CI; real training and public release still pending |
+
+## Verified source integration
+
+- PR #7 merged at 3a7981d641dff172c0394662ad0440db1b82b2fc.
+- PR #8 merged at e7854b63a9b5ece63570f2f0562f1a26ab74c398.
+- PR #9 merged at d453856671008a936323bc7be8dff3a974a57305.
+- PR #9 source CI: https://github.com/shanmukhdatta/No-Hack-/actions/runs/40193271407 (Linux, Windows, Node and ML checks passed).
+- PR #9 packaging preview: https://github.com/shanmukhdatta/No-Hack-/actions/runs/40193271417 (extension ZIP and unsigned native host preview built).
+- No validated production model, Chrome Web Store listing or signed installer is claimed.
 
 ## Resume in Antigravity
 
