@@ -15,3 +15,5 @@ Set environment variable NOHACK_DATASET to CSV/Parquet containing the exact 33 f
 Repeat stages 1–3 on each dataset separately. Combine only semantically compatible NoHackFlow records with real group provenance; never make up labels or silently rename CICFlowMeter fields. After combining, re-run all five stages.
 
 The existing nohack_kaggle.ipynb is an additional CLI handoff. No real dataset or result is distributed with these educational notebooks.
+
+When combining two or more separately audited sources, run scripts/combine_canonical_datasets.py with repeated --source ID=PATH arguments. Inspect provenance and verify feature meaning manually before training. This is a strict merger, NOT a CICFlowMeter converter.
