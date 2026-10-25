@@ -56,7 +56,7 @@ ml = [
     "evidently>=0.5,<1",
 ]
 capture = ["scapy>=2.6,<3", "psutil>=6,<9"]
-api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1"]
+api = ["fastapi>=0.115,<1", "uvicorn>=0.30,<1", "httpx>=0.27,<1"]
 ui = ["PySide6>=6.8,<7"]
 packaging = ["pyinstaller>=6.10,<7"]
 
