@@ -73,6 +73,12 @@ function renderAssessments(assessments) {
   }
 }
 
+function modelLabel(result) {
+  if (!result.connected || result.model_loaded !== true) return "Model not connected.";
+  if (result.synthetic_demo_only === true) return "SYNTHETIC DEMO MODEL — software test only, not security validated.";
+  return "Experimental trained model connected — external validation still required.";
+}
+
 function renderCurrent(current) {
   $("current-host").textContent = current.host || "Unsupported or restricted page";
   $("current-level").textContent =
@@ -118,7 +124,7 @@ $("check-companion").addEventListener("click", () => action(async () => {
   $("companion-result").textContent = result.connected
     ? "Companion connected. Capture dependencies: " +
       (result.capture?.live_capture_ready ? "detected" : "not fully detected") +
-      ". " + (result.model_loaded === true ? "Model connected." : "Model not connected — install and score with a verified local model.")
+      ". " + modelLabel(result)
     : result.reason;
   const predictions = result.connected ? await send("COMPANION_ASSESSMENTS") : null;
   renderAssessments(predictions?.assessments || []);
@@ -126,9 +132,8 @@ $("check-companion").addEventListener("click", () => action(async () => {
 
 $("mlops-refresh").addEventListener("click", () => action(async () => {
   const result = await send("COMPANION_STATUS");
-  $("mlops-model").textContent = result.connected && result.model_loaded === true
-    ? "Model connected (network-flow assessments only)."
-    : "Model not connected. " + (result.connected ? "Windows companion is reachable." : "Windows companion is unavailable.");
+  $("mlops-model").textContent = modelLabel(result) +
+    (result.connected ? " Flow-level inference only." : " Windows companion is unavailable.");
 }));
 if ($("open-dashboard")) $("open-dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 void action(refresh);
