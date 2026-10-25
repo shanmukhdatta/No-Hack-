@@ -3,6 +3,7 @@
 PSI is a heuristic, not a statistical proof of compromise or model error.
 We never store source IPs or packet payloads here.
 """
+
 from __future__ import annotations
 
 import math
@@ -25,8 +26,12 @@ def population_stability_index(
     if not np.isfinite(r).all() or not np.isfinite(c).all():
         raise ValueError("Drift data must contain only finite values")
     boundaries = np.unique(np.quantile(r, np.linspace(0, 1, bins + 1))[1:-1])
-    ref_counts = np.bincount(np.searchsorted(boundaries, r), minlength=len(boundaries) + 1)
-    cur_counts = np.bincount(np.searchsorted(boundaries, c), minlength=len(boundaries) + 1)
+    ref_counts = np.bincount(
+        np.searchsorted(boundaries, r), minlength=len(boundaries) + 1
+    )
+    cur_counts = np.bincount(
+        np.searchsorted(boundaries, c), minlength=len(boundaries) + 1
+    )
     n = len(ref_counts)
     ref_rates = (ref_counts + 0.5) / (ref_counts.sum() + 0.5 * n)
     cur_rates = (cur_counts + 0.5) / (cur_counts.sum() + 0.5 * n)
