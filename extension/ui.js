@@ -118,10 +118,17 @@ $("check-companion").addEventListener("click", () => action(async () => {
   $("companion-result").textContent = result.connected
     ? "Companion connected. Capture dependencies: " +
       (result.capture?.live_capture_ready ? "detected" : "not fully detected") +
-      ". Read-only network-flow assessments are shown below when available."
+      ". " + (result.model_loaded === true ? "Model connected." : "Model not connected — install and score with a verified local model.")
     : result.reason;
   const predictions = result.connected ? await send("COMPANION_ASSESSMENTS") : null;
   renderAssessments(predictions?.assessments || []);
+}));
+
+$("mlops-refresh").addEventListener("click", () => action(async () => {
+  const result = await send("COMPANION_STATUS");
+  $("mlops-model").textContent = result.connected && result.model_loaded === true
+    ? "Model connected (network-flow assessments only)."
+    : "Model not connected. " + (result.connected ? "Windows companion is reachable." : "Windows companion is unavailable.");
 }));
 if ($("open-dashboard")) $("open-dashboard").addEventListener("click", () => chrome.runtime.openOptionsPage());
 void action(refresh);

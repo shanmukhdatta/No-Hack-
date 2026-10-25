@@ -22,6 +22,7 @@
       <button class="tab selected" data-view="overview" aria-current="page">Overview</button>
       <button class="tab" data-view="activity">Activity</button>
       <button class="tab" data-view="companion">Companion</button>
+      <button class="tab" data-view="mlops">Model &amp; MLOps</button>
       <button class="tab" data-view="settings">Settings</button>
     </nav>
     <section data-panel="overview" class="panel">
@@ -40,6 +41,12 @@
       <button id="check-companion" class="button">Refresh local assessments</button>
       <p class="muted small">Assessments represent local network flows, not the security of the active website. They appear only after authorized capture, model training and local scoring.</p>
       <div id="ml-assessments" class="events" aria-live="polite"></div>
+    </section>
+    <section data-panel="mlops" class="panel hidden">
+      <h3>Local model &amp; experiment tracking</h3>
+      <p id="mlops-model" class="status-line" role="status">Model not connected. Install a verified local model and Windows companion before inference.</p>
+      <p class="muted small">MLflow experiments are local and separately launched. Drift warnings require reference data and are not threat verdicts. The extension never starts capture or training.</p>
+      <button id="mlops-refresh" class="button">Check model connection</button>
     </section>
     <section data-panel="settings" class="panel hidden">
       <h3>Settings & privacy</h3>

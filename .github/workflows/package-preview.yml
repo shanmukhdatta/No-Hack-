@@ -1,0 +1,40 @@
+name: No Hack packaged preview
+on:
+  workflow_dispatch:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  extension-source:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Build Chrome MV3 source ZIP
+        run: python scripts/package_extension.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nohack-extension-source-preview
+          path: dist/nohack-extension-source.zip
+          if-no-files-found: error
+  windows-native-host-preview:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install packaging and capture dependencies
+        run: |
+          python -m pip install -e ".[packaging,capture]" -c requirements/dev-py311-constraints.txt
+      - name: Compile optional Native Messaging host
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --console --name nohack-native-host --paths src scripts/native_host_entry.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nohack-native-host-windows-UNVALIDATED
+          path: dist/nohack-native-host.exe
+          if-no-files-found: error
