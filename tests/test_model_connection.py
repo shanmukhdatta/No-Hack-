@@ -31,15 +31,18 @@ def test_verified_local_model_status(monkeypatch: pytest.MonkeyPatch) -> None:
     import nohack.native_host as host
 
     urls: list[str] = []
+
     def fake_urlopen(url: str, timeout: float) -> FakeResponse:
         urls.append(url)
         assert timeout < 1
-        return FakeResponse({
-            "service": "nohack-local-api",
-            "scope": "network_flow_only",
-            "model_connected": True,
-            "model_sha256": "a" * 64,
-        })
+        return FakeResponse(
+            {
+                "service": "nohack-local-api",
+                "scope": "network_flow_only",
+                "model_connected": True,
+                "model_sha256": "a" * 64,
+            }
+        )
 
     monkeypatch.setattr(host, "urlopen", fake_urlopen)
     assert local_model_status() == {"model_loaded": True, "model_sha256": "a" * 64}
@@ -52,16 +55,19 @@ def test_refuse_unverified_status(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(
         host,
         "urlopen",
-        lambda url, timeout: FakeResponse({
-            "service": "another-app",
-            "scope": "network_flow_only",
-            "model_connected": True,
-            "model_sha256": "not-a-valid-digest",
-        }),
+        lambda url, timeout: FakeResponse(
+            {
+                "service": "another-app",
+                "scope": "network_flow_only",
+                "model_connected": True,
+                "model_sha256": "not-a-valid-digest",
+            }
+        ),
     )
     assert local_model_status()["model_loaded"] is False
 
     def not_running(url: str, timeout: float) -> FakeResponse:
         raise OSError("local service not started")
+
     monkeypatch.setattr(host, "urlopen", not_running)
     assert local_model_status() == {"model_loaded": False}
