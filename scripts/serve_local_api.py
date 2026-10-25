@@ -14,8 +14,9 @@ def main() -> None:
     args = parser.parse_args()
     if not 1024 <= args.port <= 65535:
         parser.error("Port must be an unprivileged TCP port")
-    from nohack.api.app import create_app
     import uvicorn
+
+    from nohack.api.app import create_app
 
     app = create_app(args.database, args.model, trust_local_model=args.trust_local_model)
     uvicorn.run(app, host="127.0.0.1", port=args.port, access_log=False)
