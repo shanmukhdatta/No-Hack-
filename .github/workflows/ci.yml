@@ -95,7 +95,11 @@ jobs:
           tests/test_evaluation_metrics.py tests/test_extension_package.py
           tests/test_model_connection.py tests/test_canonical_combine.py
           tests/test_demo_pipeline.py tests/test_api_demo_status.py
+          tests/test_component_readiness.py tests/test_alert_gate.py
+          tests/test_annotation_review.py tests/test_latency_and_summary.py
+          tests/test_calibration.py tests/test_baselines.py
       - name: Synthetic DEMO end-to-end executable (never real IDS metrics)
         run: >-
           python scripts/demo_model_pipeline.py
           --output-dir artifacts/demo/ci-smoke --groups 24 --folds 3
+
