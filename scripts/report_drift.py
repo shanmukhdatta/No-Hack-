@@ -1,4 +1,5 @@
 """Report unlabeled numeric drift for *canonical* NoHackFlow CSV/Parquet tables."""
+
 from __future__ import annotations
 
 import argparse
@@ -36,7 +37,11 @@ def main() -> None:
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    print(json.dumps({"warning_count": report["warning_count"], "output": str(args.output)}))
+    print(
+        json.dumps(
+            {"warning_count": report["warning_count"], "output": str(args.output)}
+        )
+    )
 
 
 if __name__ == "__main__":
