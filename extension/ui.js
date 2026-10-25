@@ -118,7 +118,7 @@ $("check-companion").addEventListener("click", () => action(async () => {
   $("companion-result").textContent = result.connected
     ? "Companion connected. Capture dependencies: " +
       (result.capture?.live_capture_ready ? "detected" : "not fully detected") +
-      ". Read-only network-flow assessments are shown below when available."
+      ". " + (result.model_loaded === true ? "Model connected." : "Model not connected — install and score with a verified local model.")
     : result.reason;
   const predictions = result.connected ? await send("COMPANION_ASSESSMENTS") : null;
   renderAssessments(predictions?.assessments || []);
