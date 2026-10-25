@@ -2,6 +2,7 @@
 
 This tool never converts CICFlowMeter headers or invents attack labels.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -35,11 +36,18 @@ def combine_sources(inputs: list[tuple[str, Path]], output: Path) -> dict[str, o
             raise ValueError("Only canonical CSV/Parquet supported")
         columns = set(frame.columns)
         expected = set(FEATURE_NAMES) | {"label", "group_id"}
-        if frame.empty or not expected.issubset(columns) or columns - expected - {"attack_family"}:
+        if (
+            frame.empty
+            or not expected.issubset(columns)
+            or columns - expected - {"attack_family"}
+        ):
             raise ValueError(f"Invalid canonical columns for source {source_id}")
         all_have_family = all_have_family and "attack_family" in frame
         frame = frame.copy()
-        if frame.group_id.isna().any() or not frame.group_id.astype(str).str.strip().all():
+        if (
+            frame.group_id.isna().any()
+            or not frame.group_id.astype(str).str.strip().all()
+        ):
             raise ValueError(f"Missing real group IDs for {source_id}")
         frame["group_id"] = source_id + "::" + frame["group_id"].astype(str)
         parts.append(frame)
@@ -47,13 +55,19 @@ def combine_sources(inputs: list[tuple[str, Path]], output: Path) -> dict[str, o
         with file.open("rb") as stream:
             for chunk in iter(lambda: stream.read(1024 * 1024), b""):
                 hasher.update(chunk)
-        provenance.append({
-            "source_id": source_id, "file_sha256": hasher.hexdigest(),
-            "rows": len(frame), "groups": int(frame.group_id.nunique()),
-        })
+        provenance.append(
+            {
+                "source_id": source_id,
+                "file_sha256": hasher.hexdigest(),
+                "rows": len(frame),
+                "groups": int(frame.group_id.nunique()),
+            }
+        )
     # Never invent a family label for a source lacking verified family annotations.
     if not all_have_family:
-        parts = [part.drop(columns=["attack_family"], errors="ignore") for part in parts]
+        parts = [
+            part.drop(columns=["attack_family"], errors="ignore") for part in parts
+        ]
     result = validate_canonical_table(pd.concat(parts, ignore_index=True))
     output.parent.mkdir(parents=True, exist_ok=True)
     if output.suffix.lower() == ".csv":
@@ -77,7 +91,9 @@ def combine_sources(inputs: list[tuple[str, Path]], output: Path) -> dict[str, o
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--source", action="append", required=True, metavar="ID=CSV_OR_PARQUET")
+    p.add_argument(
+        "--source", action="append", required=True, metavar="ID=CSV_OR_PARQUET"
+    )
     p.add_argument("--output", type=Path, required=True)
     args = p.parse_args()
     sources: list[tuple[str, Path]] = []
