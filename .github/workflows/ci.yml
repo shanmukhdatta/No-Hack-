@@ -129,5 +129,7 @@ jobs:
           git add -u
           if ! git diff --cached --quiet; then
             git commit -m "style: normalize consolidated engineering modules"
+            git fetch origin "${GITHUB_HEAD_REF}"
+            git rebase "origin/${GITHUB_HEAD_REF}"
             git push "origin" "HEAD:${{ github.head_ref }}"
           fi
