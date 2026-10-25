@@ -1,4 +1,5 @@
 """Optional FastAPI checks: no dummy success and no unauthenticated scoring."""
+
 from __future__ import annotations
 
 import pytest
