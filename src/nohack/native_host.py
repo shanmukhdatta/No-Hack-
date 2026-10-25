@@ -100,7 +100,7 @@ def handle_message(value: object) -> dict[str, object]:
             "capture": capture_capabilities(),
             "monitoring_active": False,
             "model_loaded": state["model_loaded"],
-            "model_sha256": state["model_sha256"],
+            "model_sha256": state.get("model_sha256"),
             "note": "Read-only companion; model status checked on fixed local API only",
         }
     return {"ok": False, "error": "Unsupported read-only command"}
