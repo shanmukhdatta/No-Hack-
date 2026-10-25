@@ -22,7 +22,6 @@ def create_app(
 ) -> Any:
     """Build a read-only API until an explicitly trusted model is present."""
     from fastapi import FastAPI, HTTPException
-    from pydantic import BaseModel, ConfigDict
 
     database = database or Path.home() / ".nohack" / "observations.db"
     app = FastAPI(
@@ -49,10 +48,6 @@ def create_app(
             except (OSError, ValueError, KeyError, ImportError) as exc:
                 load_error = type(exc).__name__
 
-    class FlowRequest(BaseModel):
-        model_config = ConfigDict(extra="forbid")
-        features: dict[str, int | float | str]
-
     @app.get("/health")
     def health() -> dict[str, object]:
         return {"service": "nohack-local-api", "ready": True, "model_connected": model is not None}
@@ -74,18 +69,17 @@ def create_app(
         return {"scope": "network_flows_not_browser_tabs", "items": recent_assessments(database, limit)}
 
     @app.post("/predict")
-    def predict(request: FlowRequest) -> dict[str, object]:
+    def predict(request: dict[str, Any]) -> dict[str, object]:
         """Optional local manual test; opt-in token is required for every request."""
-        from fastapi import Header
-
         # Route-level authentication is enforced by an ASGI middleware below.
         if model is None:
             raise HTTPException(status_code=503, detail="model_not_connected")
-        if set(request.features) != set(FEATURE_NAMES):
+        features = request.get("features")
+        if not isinstance(features, dict) or set(features) != set(FEATURE_NAMES):
             raise HTTPException(status_code=422, detail="NoHackFlow schema mismatch")
         from nohack.inference.hybrid import predict_features
         try:
-            return predict_features(model, request.features)
+            return predict_features(model, features)
         except (ValueError, TypeError, KeyError):
             raise HTTPException(status_code=422, detail="Invalid NoHackFlow values") from None
 
