@@ -24,6 +24,22 @@ Maintain `experiments.csv` (one experiment per row): `id, day, competition, moda
 
 Kaggle's current progression has Competitions, Code and Datasets tracks. A Competitions Grandmaster is earned by qualifying competition medals; typically Getting Started, Playground and Community competitions do **not** award points/medals. Always read an individual competition's overview for eligibility. See [official progression](https://www.kaggle.com/progression/competitions) and [competition guide](https://www.kaggle.com/learn-guide/kaggle-competitions). An excellent 10-day outcome is several reproducible mini-projects and one independently reasoned competition solution.
 
+## Cross-checked execution strategy (2026-10-26)
+
+See [the Kaggle strategy audit](docs/KAGGLE_STRATEGY_AUDIT.md) for the full review and sources.
+
+**Primary competition thread:** On Day 1, identify an active contest and determine whether it is medal-eligible. Set up the contest's permitted data, metric, folds, budget and baseline. Revisit this *same* competition for a short, documented session on each subsequent day, even as daily labs introduce other task types. A Playground/Getting Started contest is valid practice, **not** a medal shortcut.
+
+**Core sequence for every modality:** (1) understand task/rules and target; (2) audit data and label provenance; (3) choose folds matching hidden-test construction; (4) build the simplest complete baseline; (5) do controlled feature/model/hyperparameter experiments; (6) compare per-fold gains, runtime and error slices; (7) only then blend/stack; (8) freeze and produce reproducible submissions. Avoid training complex models before validation works.
+
+**Study priorities:** P0 = valid folds, metrics, baseline, error analysis, reproducibility; P1 = targeted feature engineering, strong models, calibrated/tuned experiments, proper OOF ensembles; P2 = expensive multi-level stacks, pseudo-labeling, RAPIDS acceleration and speculative deep architectures. If a P2 activity cannot be finished on available compute, record the blocker, demonstrate a smaller equivalent, and keep uncompleted boxes unchecked.
+
+**Optuna budgets:** start with a tiny toy study (5–15 trials), then run bounded studies per model/task only once the baseline is stable. Log trial counts, runtime, best CV score, seed and fold variability; do not infer that Optuna is universally better than manual decisions or that tuning fixes leakage.
+
+**Deep-learning feasibility:** Days 6–8 combine small hands-on studies and model/format surveys. Prioritize at least one carefully validated training experiment; use pretrained inference demonstrations for additional modalities when time/GPUs are constrained. Do not treat brief exposure to a model as mastery.
+
+**Daily closing check (not an extra task):** Log one application/limitation relevant to your Day-1 competition, what changed, and whether any submission or score was actually measured. Reserve time for sleep, food and breaks rather than continuous 24-hour work.
+
 ## Daily task checklists
 
 ## Day 01 — Advanced foundations: EDA, ML, metrics, tuning and competition anatomy
@@ -35,7 +51,7 @@ Kaggle's current progression has Competitions, Code and Datasets tracks. A Compe
 
 - [ ] Read an active competition's Overview, Data, Evaluation, Rules, Timeline and Code tabs; record rules on external data and AI assistance.
 - [ ] Write down task type, data modality, target, prediction unit, metric, runtime constraints, final submission format.
-- [ ] Contrast Getting Started, Playground and medal-eligible competitions; do not treat practice leaderboard rank as a medal.
+- [ ] Contrast Getting Started, Playground and medal-eligible competitions; identify one active eligible contest, record its rules/deadline and choose a continuing competition thread without treating practice ranks as medals.
 
 **Artifact:** `competition_brief.md`
 
@@ -480,7 +496,7 @@ Kaggle's current progression has Competitions, Code and Datasets tracks. A Compe
 ### D08.T02 — Small object detection experiment
 
 - [ ] Prepare a small licensed annotated image subset and verify labels visually.
-- [ ] Fine-tune a lightweight pretrained detector briefly; inspect predicted boxes and failure modes.
+- [ ] Run a lightweight pretrained detector on the verified subset; fine-tune briefly only if annotations, rules and compute allow, then inspect predicted boxes and failure modes.
 - [ ] Measure mAP where feasible and check whether object size and class frequency explain misses.
 
 **Artifact:** `detection_mini_lab.ipynb`
@@ -488,7 +504,7 @@ Kaggle's current progression has Competitions, Code and Datasets tracks. A Compe
 ### D08.T03 — Small segmentation experiment
 
 - [ ] Build a mask loader and verify mask/image alignment and resize methods.
-- [ ] Run a minimal pretrained or tiny segmentation baseline on small permitted data.
+- [ ] Run a pretrained or tiny segmentation inference baseline on small permitted data; treat extra fine-tuning as a separate compute-dependent stretch experiment.
 - [ ] Measure Dice/IoU and compare boundary vs region errors.
 
 **Artifact:** `segmentation_mini_lab.ipynb`
@@ -575,7 +591,7 @@ Kaggle's current progression has Competitions, Code and Datasets tracks. A Compe
 
 - [ ] Study at least two legitimate winning-solution writeups from different modalities.
 - [ ] Extract the recurring loop: CV, simple baseline, error analysis, targeted HPO, ensembles, reproducible submission.
-- [ ] Pick a medal-eligible competition based on rules, end date, ability to participate and hardware budget; do not assume a guaranteed medal.
+- [ ] Reassess the medal-eligible competition selected on Day 1 using its rules, deadline, participation requirements and hardware budget; decide whether to continue or document a justified switch.
 
 **Artifact:** `competition_selection.md`
 
