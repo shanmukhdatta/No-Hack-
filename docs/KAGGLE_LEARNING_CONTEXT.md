@@ -20,6 +20,14 @@
 
 **Baseline progress as of creation:** 0/180 subtasks confirmed by user. Prior work in other projects does not automatically mark these boxes completed.
 
+## Strategy review update (2026-10-26)
+
+The 10-day syllabus was independently cross-checked against the official Kaggle progression guidance and documented NVIDIA Grandmaster methods. See `docs/KAGGLE_STRATEGY_AUDIT.md` for findings, limitations and source links. Maintain the user-requested 60 tasks and 180 checkboxes.
+
+**Active competition through-line:** On D01.T01 select an active medal-eligible competition if a feasible one exists; verify competition-specific rules, evaluation, permitted model/data sources, final entry format and deadline. Maintain a short experiment journal for that same competition throughout D02–D10. Reevaluate at D09.T06; do not present historical Playground results as proof of medal attainment.
+
+**Technique priority:** scientific validation, honest baseline, error analysis and reproducibility before expensive model/tuning options. Optuna and ensembling are conditional on measured benefit; model performance is a property of data/task/CV, not a ranking of libraries. Use an explicit compute/trial budget for every experiment. Days 8–9 contain breadth-first micro-labs; if compute/data are not available, record a BLOCKED status rather than checking off work not completed. Never encourage continuous 24-hour studying; preserve sleep and breaks.
+
 ## Teaching workflow when learner returns
 
 When learner asks to "start day 3", "continue D05.T04", or sends a partial notebook:
